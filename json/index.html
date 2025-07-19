@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer Tool</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+        }
+        .header {
+            height: 30vh;
+            min-height: 100px;
+            background: #222;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .split-container {
+            display: flex;
+            height: 70vh;
+        }
+        .pane {
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+        .left-pane textarea {
+            width: 100%;
+            height: 100%;
+            resize: none;
+            font-size: 1em;
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px;
+            box-sizing: border-box;
+            background: #fff;
+        }
+        .right-pane {
+            background: #1e1e1e;
+            color: #fff;
+            border-radius: 6px;
+            position: relative;
+        }
+        .error {
+            color: #ff4d4f;
+            margin-bottom: 12px;
+            font-weight: bold;
+            position: static;
+            left: unset;
+            right: unset;
+            bottom: unset;
+            z-index: unset;
+            background: #fff0f0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .left-pane-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .left-pane-controls button {
+            padding: 6px 14px;
+            font-size: 1em;
+            border: none;
+            border-radius: 4px;
+            background: #222;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .left-pane-controls button:hover {
+            background: #444;
+        }
+        .json-stats {
+            margin-top: 10px;
+            font-size: 0.95em;
+            color: #333;
+            background: #f0f0f0;
+            border-radius: 4px;
+            padding: 8px 12px;
+        }
+    </style>
+    <!-- CDN for jsoneditor -->
+    <link href="https://cdn.jsdelivr.net/npm/jsoneditor@9.10.0/dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="header">JSON Humanizer & Validator</div>
+    <div class="split-container">
+        <div class="pane left-pane">
+            <div class="left-pane-controls">
+                <button id="minify-btn" type="button">reduse json to one line without empty spaces</button>
+                <button id="prettify-btn" type="button">prettify json to human view</button>
+            </div>
+            <textarea id="json-input" placeholder="Paste or type your JSON here..."></textarea>
+            <div id="json-stats" class="json-stats"></div>
+        </div>
+        <div class="pane right-pane">
+            <div id="error-msg" class="error" style="display:none;"></div>
+            <div id="json-viewer"></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jsoneditor@9.10.0/dist/jsoneditor.min.js"></script>
+    <script>
+        const input = document.getElementById('json-input');
+        const errorMsg = document.getElementById('error-msg');
+        const viewer = document.getElementById('json-viewer');
+        const minifyBtn = document.getElementById('minify-btn');
+        const prettifyBtn = document.getElementById('prettify-btn');
+        const statsPanel = document.getElementById('json-stats');
+        // Remove previous viewer content
+        viewer.innerHTML = '';
+        // Create JSONEditor in view mode
+        const editor = new JSONEditor(viewer, {
+            mode: 'view',
+            mainMenuBar: false,
+            navigationBar: false,
+            statusBar: false,
+            onError: function (err) {
+                errorMsg.textContent = err.toString();
+                errorMsg.style.display = 'block';
+            }
+        });
+
+        function renderJSON() {
+            const value = input.value.trim();
+            if (!value) {
+                errorMsg.style.display = 'none';
+                editor.clear();
+                statsPanel.textContent = '';
+                return;
+            }
+            try {
+                const obj = JSON.parse(value);
+                errorMsg.style.display = 'none';
+                editor.set(obj);
+                updateStats(value, obj);
+            } catch (e) {
+                errorMsg.textContent = 'Invalid JSON: ' + e.message;
+                errorMsg.style.display = 'block';
+                editor.clear();
+                updateStats(value, null);
+            }
+        }
+
+        function updateStats(text, obj) {
+            // Number of lines
+            const numLines = text.split(/\r?\n/).length;
+            let numKeys = 0;
+            let numElements = 0;
+            let type = '-';
+            if (obj && typeof obj === 'object') {
+                if (Array.isArray(obj)) {
+                    type = 'Array';
+                    numElements = obj.length;
+                } else {
+                    type = 'Object';
+                    numKeys = Object.keys(obj).length;
+                }
+            } else if (obj !== null) {
+                type = typeof obj;
+            }
+            let stats = `Lines: ${numLines}`;
+            if (type === 'Object') stats += ` | Keys: ${numKeys}`;
+            if (type === 'Array') stats += ` | Elements: ${numElements}`;
+            stats += ` | Type: ${type}`;
+            statsPanel.textContent = stats;
+        }
+
+        minifyBtn.addEventListener('click', function() {
+            try {
+                const obj = JSON.parse(input.value);
+                input.value = JSON.stringify(obj);
+                renderJSON();
+            } catch (e) {
+                errorMsg.textContent = 'Invalid JSON: ' + e.message;
+                errorMsg.style.display = 'block';
+            }
+        });
+        prettifyBtn.addEventListener('click', function() {
+            try {
+                const obj = JSON.parse(input.value);
+                input.value = JSON.stringify(obj, null, 2);
+                renderJSON();
+            } catch (e) {
+                errorMsg.textContent = 'Invalid JSON: ' + e.message;
+                errorMsg.style.display = 'block';
+            }
+        });
+
+        input.addEventListener('input', renderJSON);
+        input.addEventListener('paste', function() {
+            setTimeout(renderJSON, 0);
+        });
+    </script>
+</body>
+</html> 

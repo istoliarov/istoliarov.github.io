@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        // Get the current query string and hash
+        var query = window.location.search || '';
+        var hash = window.location.hash || '';
+        // Construct the target URL
+        var targetUrl = 'http://ias-card.duckdns.org' + query + hash;
+        // Redirect
+        window.location.replace(targetUrl);
+    </script>
+</head>
+<body>
+    <p>Redirecting to <a id="redirect-link" href="#">http://ias-card.duckdns.org</a>...</p>
+    <button id="manual-redirect" style="display:block;margin-top:20px;">Click here if you are not redirected</button>
+    <script>
+        // Update the link for users without JS redirect
+        document.getElementById('redirect-link').href = targetUrl;
+        // Add manual redirect button functionality
+        document.getElementById('manual-redirect').onclick = function() {
+            window.location.href = targetUrl;
+        };
+    </script>
+</body>
+</html> 
