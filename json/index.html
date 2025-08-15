@@ -98,14 +98,14 @@
 </head>
 <body>
     <div class="header">JSON Humanizer & Validator</div>
+    <div class="left-pane-controls">
+        <button id="minify-btn" type="button">reduse json to one line without empty spaces</button>
+        <button id="prettify-btn" type="button">prettify json to human view</button>
+    </div>
+    <div id="json-stats" class="json-stats"></div>
     <div class="split-container">
         <div class="pane left-pane">
-            <div class="left-pane-controls">
-                <button id="minify-btn" type="button">reduse json to one line without empty spaces</button>
-                <button id="prettify-btn" type="button">prettify json to human view</button>
-            </div>
             <textarea id="json-input" placeholder="Paste or type your JSON here..."></textarea>
-            <div id="json-stats" class="json-stats"></div>
         </div>
         <div class="pane right-pane">
             <div id="error-msg" class="error" style="display:none;"></div>
