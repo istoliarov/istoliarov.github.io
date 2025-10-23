@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tools index</title>
+  <style>
+    body{font-family:Inter,Segoe UI,Roboto,Arial;background:#071029;color:#e6eef6;margin:0;padding:40px}
+    .wrap{max-width:900px;margin:0 auto}
+    h1{margin:0 0 18px}
+    .list{display:grid;gap:10px}
+    a.card{display:block;padding:14px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));color:#dff6fb;text-decoration:none}
+    .meta{color:#94a3b8;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Tools</h1>
+    <div id="list" class="list"></div>
+    <div style="margin-top:18px;color:#94a3b8;font-size:13px">Click a folder to open its index page.</div>
+  </div>
+
+<script>
+(function(){
+  // static list of subfolders - update if you add more
+  const subfolders = [
+    {name: 'json', path: 'json/index.html'},
+    {name: 'net-speed', path: 'net-speed/index.html'}
+  ];
+  const list = document.getElementById('list');
+  subfolders.forEach(s=>{
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = s.path;
+    a.innerHTML = '<div style="font-weight:700">' + s.name + '</div><div class="meta">Open ' + s.path + '</div>';
+    list.appendChild(a);
+  });
+})();
+</script>
+</body>
+</html>
