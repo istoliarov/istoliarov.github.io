@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PDF Toolbox — Tools</title>
+  <meta name="description" content="PDF tools: sign, watermark, rotate PDFs — client-side.">
+  <meta name="keywords" content="pdf sign, pdf watermark, pdf rotate, pdf tools">
+  <link rel="canonical" href="/tools/pdf/other.html">
+  <meta name="robots" content="index,follow">
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--accent:#667eea;--muted:#666}
+    *{box-sizing:border-box}
+    body{font-family:Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);margin:0;padding:0;color:#222;display:flex;flex-direction:column;min-height:100vh}
+    .navbar{background:#fff;border-bottom:1px solid #eee;padding:12px 20px;position:sticky;top:0;z-index:100}
+    .navbar .nav-content{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+    .navbar h2{margin:0;font-size:1.1rem;color:var(--accent)}
+    .navbar .brand, .navbar .brand:visited, .navbar .brand:active, .navbar .brand:hover{color:inherit;text-decoration:none}
+    .navbar .brand:hover{text-decoration:underline}
+    .navbar-menu{display:flex;gap:16px;align-items:center}
+    .navbar-menu a{text-decoration:none;color:var(--accent);font-size:.95rem}
+    .navbar-menu a:hover{text-decoration:underline}
+    .navbar-menu a.current{font-weight:bold}
+    .wrap{max-width:1000px;margin:20px auto;padding:20px;flex:1;width:calc(100% - 40px)}
+    h1{margin:0 0 8px;font-size:1.4rem}
+    .hint-header{color:var(--muted);font-size:.9rem;margin-bottom:20px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+    .card{background:var(--card);border-radius:8px;padding:14px;box-shadow:0 6px 18px rgba(20,20,40,.06)}
+    label{display:block;font-size:.95rem;margin-bottom:8px}
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    input[type=file]{padding:6px}
+    input[type=text]{padding:6px;border:1px solid #ddd;border-radius:6px;flex:1}
+    input[type=number]{padding:6px;border:1px solid #ddd;border-radius:6px;width:100px}
+    input[type=range]{flex:1}
+    button{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+    button:hover{opacity:0.9}
+    .dropzone{border:2px dashed #e0e6ff;border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px;cursor:pointer}
+    .dropzone.dragover{background:#eef2ff;border-color:var(--accent)}
+    .progress{width:100%;background:#f0f0f0;border-radius:6px;height:12px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:var(--accent);width:0%}
+    .hint{font-size:.85rem;color:var(--muted);margin-top:8px}
+    .preview{margin-top:10px;max-width:100%;max-height:300px;border:1px solid #ddd;border-radius:6px}
+    .page-footer{text-align:center;color:#666;font-size:.8rem;padding:12px 20px;border-top:1px solid #eee;position:fixed;left:0;right:0;bottom:50px;background:#fff;z-index:10000}
+    /* SEO bar */
+    .seo-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,0.98);font-size:11px;color:#444;padding:6px 12px;border-top:1px solid #eee;display:flex;justify-content:center;align-items:center;z-index:9999}
+    .seo-bar .seo-text{opacity:0.9}
+  </style>
+  <meta property="og:title" content="PDF Toolbox — Tools">
+  <meta property="og:description" content="Sign, watermark, and rotate PDFs directly in the browser.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/tools/pdf/other.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PDF Toolbox — Tools">
+  <meta name="twitter:description" content="Sign, watermark, and rotate PDFs directly in the browser.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "PDF Toolbox — Tools",
+    "description": "Tools to sign, watermark, and rotate PDFs client-side.",
+    "url": "/tools/pdf/other.html"
+  }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfjs-dist/3.11.174/pdf.worker.min.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-content">
+      <h2><a class="brand" href="index.html">PDF Toolbox</a></h2>
+      <div class="navbar-menu">
+        <a href="index.html">Home</a>
+        <a href="to-pdf.html">To PDF</a>
+        <a href="from-pdf.html">From PDF</a>
+        <a href="other.html" class="current">Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <h1>PDF Tools</h1>
+    <div class="hint-header">Sign, watermark, and rotate PDFs — client-side</div>
+
+    <div class="grid">
+      <div class="card">
+        <label>Add Watermark</label>
+        <div id="wmDrop" class="dropzone">Drop PDF here or <input id="wmIn" type="file" accept="application/pdf" style="margin-left:6px"></div>
+        <div class="controls" style="margin-top:10px">
+          <input id="wmText" type="text" placeholder="Watermark text" style="flex:1">
+        </div>
+        <div class="controls" style="margin-top:8px">
+          <label class="hint">Opacity:</label>
+          <input id="wmOpacity" type="range" min="0.1" max="1" step="0.1" value="0.5" style="flex:1">
+          <span id="wmOpacityVal" class="hint">50%</span>
+        </div>
+        <div class="controls" style="margin-top:8px">
+          <button id="wmBtn">Add Watermark</button>
+        </div>
+        <div id="wmOut" class="hint"></div>
+        <div id="wmProgress" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <label>Rotate PDF Pages</label>
+        <div id="rotateDrop" class="dropzone">Drop PDF here or <input id="rotateIn" type="file" accept="application/pdf" style="margin-left:6px"></div>
+        <div class="controls" style="margin-top:10px">
+          <label class="hint">Rotation:</label>
+          <select id="rotateAngle">
+            <option value="90">90°</option>
+            <option value="180">180°</option>
+            <option value="270">270°</option>
+            <option value="-90">-90°</option>
+          </select>
+          <button id="rotateBtn">Rotate All Pages</button>
+        </div>
+        <div id="rotateOut" class="hint"></div>
+        <div id="rotateProgress" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <label>Add Digital Signature</label>
+        <div id="signDrop" class="dropzone">Drop PDF here or <input id="signIn" type="file" accept="application/pdf" style="margin-left:6px"></div>
+        <div class="controls" style="margin-top:10px">
+          <input id="signName" type="text" placeholder="Your name" style="flex:1">
+        </div>
+        <div class="controls" style="margin-top:8px">
+          <input id="signDate" type="text" placeholder="Date (e.g., 2025-01-15)" style="flex:1">
+        </div>
+        <div class="controls" style="margin-top:8px">
+          <label class="hint">Position:</label>
+          <select id="signPos">
+            <option value="bottom-left">Bottom Left</option>
+            <option value="bottom-right">Bottom Right</option>
+            <option value="top-left">Top Left</option>
+            <option value="top-right">Top Right</option>
+          </select>
+        </div>
+        <div class="controls" style="margin-top:8px">
+          <button id="signBtn">Add Signature</button>
+        </div>
+        <div id="signOut" class="hint"></div>
+        <div id="signProgress" style="margin-top:8px"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const { jsPDF } = window.jspdf;
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    function downloadBlob(blob, filename){ const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),10000); }
+    function setProgress(id,pct,text){ const c=document.getElementById(id); c.innerHTML=`<div class="progress"><i style="width:${pct}%"></i></div>` + (text?`<div class="hint">${text}</div>`:''); }
+    function clearProgress(id){ document.getElementById(id).innerHTML=''; }
+    function setupDrop(dropId,inputId,outId){ const drop=document.getElementById(dropId), input=document.getElementById(inputId), out=document.getElementById(outId); ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('dragover')})); ['dragleave','drop','dragend'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('dragover')})); drop.addEventListener('drop', ev=>{ const files=Array.from(ev.dataTransfer.files||[]); if(files.length){ try{ const dt=new DataTransfer(); files.forEach(f=>dt.items.add(f)); input.files=dt.files;}catch(_){} if(out) out.innerHTML=`<span class="hint">${files.length} file(s) selected</span>`; } }); }
+    
+    setupDrop('wmDrop','wmIn','wmOut');
+    setupDrop('rotateDrop','rotateIn','rotateOut');
+    setupDrop('signDrop','signIn','signOut');
+
+    // Watermark opacity slider
+    document.getElementById('wmOpacity').addEventListener('change', (e)=>{ document.getElementById('wmOpacityVal').textContent=(parseInt(e.target.value*100))+'%'; });
+
+    // Add Watermark
+    document.getElementById('wmBtn').addEventListener('click', async ()=>{
+      const file=document.getElementById('wmIn').files[0], out=document.getElementById('wmOut'), wmText=document.getElementById('wmText').value, wmOpacity=parseFloat(document.getElementById('wmOpacity').value);
+      out.innerHTML=''; if(!file){ out.textContent='Select or drop a PDF file'; return; }
+      if(!wmText){ out.textContent='Enter watermark text'; return; }
+      try{
+        setProgress('wmProgress',10,'Loading PDF...');
+        const arrayBuf=await file.arrayBuffer();
+        const pdf=await pdfjsLib.getDocument({data:arrayBuf}).promise;
+        const newPdf=new jsPDF({unit:'pt',format:[pdf.getPage(1).getWidth(), pdf.getPage(1).getHeight()]});
+        for(let p=1;p<=pdf.numPages;p++){
+          setProgress('wmProgress', Math.round((p/pdf.numPages)*90), `Processing page ${p}/${pdf.numPages}`);
+          const page=await pdf.getPage(p);
+          const viewport=page.getViewport({scale:2});
+          const canvas=document.createElement('canvas');
+          const ctx=canvas.getContext('2d');
+          canvas.width=viewport.width;
+          canvas.height=viewport.height;
+          await page.render({canvasContext:ctx,viewport}).promise;
+          const imgData=canvas.toDataURL('image/png');
+          if(p>1) newPdf.addPage();
+          newPdf.addImage(imgData,'PNG',0,0,newPdf.internal.pageSize.getWidth(),newPdf.internal.pageSize.getHeight());
+          newPdf.setFont('Helvetica','bold');
+          newPdf.setFontSize(60);
+          newPdf.setTextColor(0,0,0,wmOpacity*255);
+          const pageW=newPdf.internal.pageSize.getWidth(), pageH=newPdf.internal.pageSize.getHeight();
+          newPdf.text(wmText, pageW/2, pageH/2, {align:'center', angle:45});
+        }
+        setProgress('wmProgress',95,'Generating PDF...');
+        const blob=newPdf.output('blob');
+        downloadBlob(blob,'watermarked.pdf');
+        out.innerHTML='<span class="hint">Done — <a href="#" class="download" onclick="return false;">download</a></span>';
+        out.querySelector('a').addEventListener('click',()=>downloadBlob(blob,'watermarked.pdf'));
+      }catch(err){ out.textContent='Error: '+err.message; }
+      clearProgress('wmProgress');
+    });
+
+    // Rotate PDF
+    document.getElementById('rotateBtn').addEventListener('click', async ()=>{
+      const file=document.getElementById('rotateIn').files[0], out=document.getElementById('rotateOut'), angle=parseInt(document.getElementById('rotateAngle').value);
+      out.innerHTML=''; if(!file){ out.textContent='Select or drop a PDF file'; return; }
+      try{
+        setProgress('rotateProgress',10,'Loading PDF...');
+        const arrayBuf=await file.arrayBuffer();
+        const pdf=await pdfjsLib.getDocument({data:arrayBuf}).promise;
+        const newPdf=new jsPDF({orientation:'p',unit:'pt',format:'a4'});
+        for(let p=1;p<=pdf.numPages;p++){
+          setProgress('rotateProgress', Math.round((p/pdf.numPages)*90), `Processing page ${p}/${pdf.numPages}`);
+          const page=await pdf.getPage(p);
+          const viewport=page.getViewport({scale:2});
+          const canvas=document.createElement('canvas');
+          const ctx=canvas.getContext('2d');
+          canvas.width=viewport.width;
+          canvas.height=viewport.height;
+          ctx.save();
+          ctx.translate(canvas.width/2,canvas.height/2);
+          ctx.rotate((angle*Math.PI)/180);
+          ctx.translate(-canvas.width/2,-canvas.height/2);
+          await page.render({canvasContext:ctx,viewport}).promise;
+          ctx.restore();
+          const imgData=canvas.toDataURL('image/png');
+          if(p>1) newPdf.addPage();
+          newPdf.addImage(imgData,'PNG',0,0,newPdf.internal.pageSize.getWidth(),newPdf.internal.pageSize.getHeight());
+        }
+        setProgress('rotateProgress',95,'Generating PDF...');
+        const blob=newPdf.output('blob');
+        downloadBlob(blob,'rotated.pdf');
+        out.innerHTML='<span class="hint">Done — <a href="#" class="download" onclick="return false;">download</a></span>';
+        out.querySelector('a').addEventListener('click',()=>downloadBlob(blob,'rotated.pdf'));
+      }catch(err){ out.textContent='Error: '+err.message; }
+      clearProgress('rotateProgress');
+    });
+
+    // Add Signature
+    document.getElementById('signBtn').addEventListener('click', async ()=>{
+      const file=document.getElementById('signIn').files[0], out=document.getElementById('signOut'), signName=document.getElementById('signName').value, signDate=document.getElementById('signDate').value, signPos=document.getElementById('signPos').value;
+      out.innerHTML=''; if(!file){ out.textContent='Select or drop a PDF file'; return; }
+      if(!signName){ out.textContent='Enter your name'; return; }
+      try{
+        setProgress('signProgress',10,'Loading PDF...');
+        const arrayBuf=await file.arrayBuffer();
+        const pdf=await pdfjsLib.getDocument({data:arrayBuf}).promise;
+        const lastPage=await pdf.getPage(pdf.numPages);
+        const viewport=lastPage.getViewport({scale:2});
+        const canvas=document.createElement('canvas');
+        const ctx=canvas.getContext('2d');
+        canvas.width=viewport.width;
+        canvas.height=viewport.height;
+        await lastPage.render({canvasContext:ctx,viewport}).promise;
+        const imgData=canvas.toDataURL('image/png');
+        const newPdf=new jsPDF({unit:'pt',format:[lastPage.getWidth(),lastPage.getHeight()]});
+        newPdf.addImage(imgData,'PNG',0,0,newPdf.internal.pageSize.getWidth(),newPdf.internal.pageSize.getHeight());
+        newPdf.setFont('Helvetica','normal');
+        newPdf.setFontSize(10);
+        const margin=20, text=`Signed by: ${signName}${signDate?' on '+signDate:''}`;
+        if(signPos==='bottom-left'){ newPdf.text(text, margin, newPdf.internal.pageSize.getHeight()-margin); }
+        else if(signPos==='bottom-right'){ newPdf.text(text, newPdf.internal.pageSize.getWidth()-margin, newPdf.internal.pageSize.getHeight()-margin, {align:'right'}); }
+        else if(signPos==='top-left'){ newPdf.text(text, margin, margin+10); }
+        else if(signPos==='top-right'){ newPdf.text(text, newPdf.internal.pageSize.getWidth()-margin, margin+10, {align:'right'}); }
+        setProgress('signProgress',95,'Generating PDF...');
+        const blob=newPdf.output('blob');
+        downloadBlob(blob,'signed.pdf');
+        out.innerHTML='<span class="hint">Done — <a href="#" class="download" onclick="return false;">download</a></span>';
+        out.querySelector('a').addEventListener('click',()=>downloadBlob(blob,'signed.pdf'));
+      }catch(err){ out.textContent='Error: '+err.message; }
+      clearProgress('signProgress');
+    });
+
+  })();
+  </script>
+
+  <div class="page-footer">Created in 2025 by Igor Stoliarov<br><small><a href="COPYRIGHT" style="color:#666;text-decoration:none;font-size:.75rem">© Copyright & License</a></small></div>
+  <div class="seo-bar"><span class="seo-text">Description: Add watermarks, signatures, and rotate PDFs — client-side. &nbsp;|&nbsp; Keywords: pdf sign, pdf watermark, pdf rotate</span></div>
+</body>
+</html>
