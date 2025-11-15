@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PDF Toolbox — To PDF</title>
+  <meta name="description" content="Convert images, text and Word (.docx) to PDF — client-side.">
+  <meta name="keywords" content="image to pdf, txt to pdf, docx to pdf, pdf toolbox">
+  <link rel="canonical" href="/tools/pdf/to-pdf.html">
+  <meta name="robots" content="index,follow">
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--accent:#667eea;--muted:#666}
+    *{box-sizing:border-box}
+    body{font-family:Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);margin:0;padding:20px 20px 56px;color:#222}
+    .wrap{max-width:1000px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{margin:.2rem 0;font-size:1.4rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+    .card{background:var(--card);border-radius:8px;padding:14px;box-shadow:0 6px 18px rgba(20,20,40,.06)}
+    label{display:block;font-size:.95rem;margin-bottom:8px}
+    .controls{display:flex;gap:8px;align-items:center}
+    input[type=file]{padding:6px}
+    button{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+    .dropzone{border:2px dashed #e0e6ff;border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px;cursor:pointer}
+    .dropzone.dragover{background:#eef2ff;border-color:var(--accent)}
+    .progress{width:100%;background:#f0f0f0;border-radius:6px;height:12px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:var(--accent);width:0%}
+    .hint{font-size:.85rem;color:var(--muted);margin-top:8px}
+    a.nav{font-size:.9rem;color:var(--accent);text-decoration:none}
+    /* SEO bar */
+    .seo-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,0.95);font-size:11px;color:#444;padding:6px 12px;border-top:1px solid #eee;display:flex;justify-content:center;align-items:center;z-index:9999}
+    .seo-bar .seo-text{opacity:0.9}
+  </style>
+  <meta property="og:title" content="PDF Toolbox — To PDF">
+  <meta property="og:description" content="Convert images, text and Word (.docx) to PDF directly in your browser.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/tools/pdf/to-pdf.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PDF Toolbox — To PDF">
+  <meta name="twitter:description" content="Convert images, text and Word (.docx) to PDF directly in your browser.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "PDF Toolbox — To PDF",
+    "description": "Convert images, text and Word (.docx) to PDF client-side.",
+    "url": "/tools/pdf/to-pdf.html"
+  }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>To PDF</h1>
+        <div class="hint">Images → PDF, TXT → PDF, DOCX → PDF — client-side</div>
+      </div>
+      <nav>
+        <a class="nav" href="index.html">← Home</a>
+        &nbsp;·&nbsp;
+        <a class="nav" href="from-pdf.html">From PDF →</a>
+      </nav>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <label>Images → PDF</label>
+        <div id="imagesDrop" class="dropzone">Drop images here or <input id="imagesIn" type="file" accept="image/*" multiple style="margin-left:6px"></div>
+        <div class="controls" style="margin-top:10px">
+          <label class="hint">Page size:</label>
+          <select id="imgPageSize">
+            <option value="a4">A4</option>
+            <option value="letter">Letter</option>
+          </select>
+          <button id="imagesToPdf">Convert images → PDF</button>
+        </div>
+        <div id="imagesOut" class="hint"></div>
+        <div id="imagesProgress" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <label>Text (.txt) → PDF</label>
+        <div id="txtDrop" class="dropzone">Drop .txt here or <input id="txtIn" type="file" accept="text/plain" style="margin-left:6px"></div>
+        <div class="controls" style="margin-top:10px">
+          <label class="hint">Font size:</label>
+          <input id="txtFont" type="number" value="12" min="6" max="36" style="width:76px;padding:6px;border:1px solid #ddd;border-radius:6px">
+          <button id="txtToPdf">Convert txt → PDF</button>
+        </div>
+        <div id="txtOut" class="hint"></div>
+        <div id="txtProgress" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <label>Word (.docx) → PDF</label>
+        <div id="docxDrop" class="dropzone">Drop .docx here or <input id="docxIn" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="margin-left:6px"></div>
+        <div class="controls" style="margin-top:10px">
+          <button id="docxToPdf">Convert docx → PDF</button>
+        </div>
+        <div id="docxOut" class="hint"></div>
+        <div id="docxProgress" style="margin-top:8px"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const { jsPDF } = window.jspdf;
+    function downloadBlob(blob, filename){ const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),10000); }
+    function setProgress(id, pct, text){ const c = document.getElementById(id); c.innerHTML = `<div class="progress"><i style="width:${pct}%"></i></div>` + (text?`<div class="hint">${text}</div>`:''); }
+    function clearProgress(id){ document.getElementById(id).innerHTML=''; }
+    function setupDrop(dropId, inputId, outId){ const drop=document.getElementById(dropId), input=document.getElementById(inputId), out=document.getElementById(outId); ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('dragover')})); ['dragleave','drop','dragend'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('dragover')})); drop.addEventListener('drop', ev=>{ const files=Array.from(ev.dataTransfer.files||[]); if(files.length){ try{ const dt=new DataTransfer(); files.forEach(f=>dt.items.add(f)); input.files=dt.files;}catch(_){} if(out) out.innerHTML=`<span class="hint">${files.length} file(s) selected</span>`; } }); }
+    setupDrop('imagesDrop','imagesIn','imagesOut'); setupDrop('txtDrop','txtIn','txtOut'); setupDrop('docxDrop','docxIn','docxOut');
+
+    // images -> pdf
+    async function fileToImage(file){ return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>{ const img=new Image(); img.onload=()=>res(img); img.onerror=rej; img.src=fr.result }; fr.onerror=rej; fr.readAsDataURL(file); }); }
+    function getImageProps(img){ return {w:img.naturalWidth,h:img.naturalHeight}; }
+    document.getElementById('imagesToPdf').addEventListener('click', async ()=>{
+      const files = Array.from(document.getElementById('imagesIn').files || []); const out=document.getElementById('imagesOut'); out.innerHTML=''; if(!files.length){ out.textContent='Select or drop images.'; return; }
+      const pageSize = document.getElementById('imgPageSize').value; const pdf = new jsPDF({unit:'pt',format:pageSize}); setProgress('imagesProgress',0,'Preparing...');
+      try{
+        for(let i=0;i<files.length;i++){
+          setProgress('imagesProgress', Math.round((i/files.length)*100), `Processing ${i+1}/${files.length}`);
+          const img = await fileToImage(files[i]); const imgProps=getImageProps(img); const pageW=pdf.internal.pageSize.getWidth(), pageH=pdf.internal.pageSize.getHeight(); const ratio=Math.min(pageW/imgProps.w,pageH/imgProps.h); const w=imgProps.w*ratio, h=imgProps.h*ratio, x=(pageW-w)/2, y=(pageH-h)/2; pdf.addImage(img,'JPEG',x,y,w,h); if(i<files.length-1) pdf.addPage();
+        }
+        setProgress('imagesProgress',100,'Generating PDF...'); const blob = pdf.output('blob'); downloadBlob(blob,'images-to-pdf.pdf'); out.innerHTML=`<span class="hint">Converted — <a href="#" class="download" onclick="return false;">download</a></span>`; out.querySelector('a').addEventListener('click', ()=>downloadBlob(blob,'images-to-pdf.pdf'));
+      }catch(err){ out.textContent='Error: '+err.message; }
+      clearProgress('imagesProgress');
+    });
+
+    // txt -> pdf
+    document.getElementById('txtToPdf').addEventListener('click', async ()=>{
+      const file=document.getElementById('txtIn').files[0], out=document.getElementById('txtOut'); out.innerHTML=''; if(!file){ out.textContent='Select or drop a .txt file'; return; }
+      setProgress('txtProgress',10,'Reading...'); try{ const text=await file.text(); setProgress('txtProgress',40,'Formatting...'); const fontSize=Math.max(6,Math.min(36,parseInt(document.getElementById('txtFont').value)||12)); const pdf=new jsPDF({unit:'pt',format:'a4'}); const margin=40, lineHeight=fontSize*1.2, pageW=pdf.internal.pageSize.getWidth(), pageH=pdf.internal.pageSize.getHeight(); pdf.setFontSize(fontSize); const lines=pdf.splitTextToSize(text, pageW-margin*2); let cursorY=margin; for(let i=0;i<lines.length;i++){ if(cursorY+lineHeight>pageH-margin){ pdf.addPage(); cursorY=margin;} pdf.text(lines[i], margin, cursorY); cursorY+=lineHeight; } setProgress('txtProgress',90,'Generating...'); const blob=pdf.output('blob'); downloadBlob(blob,'text-to-pdf.pdf'); out.innerHTML=`<span class="hint">Converted — <a href="#" class="download" onclick="return false;">download</a></span>`; out.querySelector('a').addEventListener('click', ()=>downloadBlob(blob,'text-to-pdf.pdf'));
+      }catch(err){ out.textContent='Error: '+err.message; } clearProgress('txtProgress');
+    });
+
+    // docx -> pdf
+    document.getElementById('docxToPdf').addEventListener('click', async ()=>{
+      const file=document.getElementById('docxIn').files[0], out=document.getElementById('docxOut'); out.innerHTML=''; if(!file){ out.textContent='Select or drop a .docx file'; return; }
+      setProgress('docxProgress',5,'Reading...'); try{ const arrayBuffer=await file.arrayBuffer(); setProgress('docxProgress',25,'Converting to HTML...'); const result=await mammoth.convertToHtml({arrayBuffer}); const html=result.value; const container=document.createElement('div'); container.style.padding='10px'; container.style.width='800px'; container.style.background='#fff'; container.innerHTML=html; document.body.appendChild(container); const pdf=new jsPDF({unit:'pt',format:'a4'}); setProgress('docxProgress',60,'Rendering...'); await pdf.html(container, {callback:function(){ const blob=pdf.output('blob'); downloadBlob(blob,'docx-to-pdf.pdf'); out.innerHTML=`<span class="hint">Converted — <a href="#" class="download" onclick="return false;">download</a></span>`; out.querySelector('a').addEventListener('click', ()=>downloadBlob(blob,'docx-to-pdf.pdf')); container.remove(); clearProgress('docxProgress'); }, x:10, y:10, autoPaging:true}); }catch(err){ out.textContent='Error: '+err.message; clearProgress('docxProgress'); }
+    });
+
+  })();
+  </script>
+  <div class="seo-bar"><span class="seo-text">Description: Convert images, text and Word (.docx) to PDF — client-side. &nbsp;|&nbsp; Keywords: image to pdf, txt to pdf, docx to pdf</span></div>
+</body>
+</html>

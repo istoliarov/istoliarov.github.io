@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Impact in Online Games - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .controls-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 500;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="number"] {
+            width: 70px;
+            padding: 6px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .value-display {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9em;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .global-controls {
+            border-top: 2px solid #eee;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .windows-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .window {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .window:hover {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .window-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .window-description {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .canvas-container {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e9ecef;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .window-controls {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+        }
+
+        .delay-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .delay-control label {
+            margin: 0;
+            font-size: 0.85em;
+        }
+
+        .delay-control input[type="range"] {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .delay-control input[type="number"] {
+            width: 60px;
+        }
+
+        .delay-control .value-display {
+            min-width: 50px;
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .info-box strong {
+            color: #667eea;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 1200px) {
+            .windows-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sync-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Ping Impact Simulator</h1>
+            <p class="subtitle">Experience how latency (ping) affects responsiveness in online games</p>
+        </header>
+
+        <div class="controls-section">
+            <div class="controls-title">⚙️ Global Configuration</div>
+            
+            <div class="control-group">
+                <div class="control-item">
+                    <label for="globalDelay">Global Ping Delay (ms):</label>
+                    <div class="input-wrapper">
+                        <input type="range" id="globalDelay" min="1" max="9999" value="100">
+                        <span class="value-display" id="globalDelayValue">100</span>
+                        <span>ms</span>
+                    </div>
+                </div>
+                <div class="control-item">
+                    <label for="globalSpeed">Global Speed/Velocity:</label>
+                    <div class="input-wrapper">
+                        <input type="range" id="globalSpeed" min="0.5" max="5" step="0.5" value="2">
+                        <span class="value-display" id="globalSpeedValue">2.0</span>
+                        <span>x</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="global-controls">
+                <div class="button-group">
+                    <button class="btn-primary" id="syncAllDelayBtn">🔗 Sync Ping to All</button>
+                    <button class="btn-primary" id="syncAllSpeedBtn">🔗 Sync Speed to All</button>
+                    <button class="btn-secondary" id="resetAllBtn">🔄 Reset All</button>
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 15px; margin-bottom: 0;">
+                <strong>📊 Understanding the difference:</strong><br>
+                • <strong>Ping Delay:</strong> Network latency - how long it takes for your action to reach the server and back<br>
+                • <strong>Speed:</strong> Animation velocity - how fast objects move (affects visual responsiveness perception)
+            </div>
+        </div>
+
+        <div class="windows-section">
+            <!-- Vertical Bounce Window -->
+            <div class="window">
+                <div class="window-title">⬆️⬇️ Vertical Bounce</div>
+                <div class="window-description">
+                    Circle bounces from top to bottom. Simulates vertical movement responsiveness with lag effects.
+                </div>
+                <div class="canvas-container">
+                    <canvas id="canvas1" width="300" height="300"></canvas>
+                </div>
+                <div class="window-controls">
+                    <div class="delay-control">
+                        <label for="delay1">Ping Delay:</label>
+                        <input type="range" id="delay1" min="1" max="9999" value="100">
+                        <input type="number" id="delayInput1" min="1" max="9999" value="100">
+                        <span class="value-display" id="delay1Value">100</span>
+                        <span>ms</span>
+                    </div>
+                    <div class="delay-control" style="margin-top: 10px;">
+                        <label for="speed1">Speed:</label>
+                        <input type="range" id="speed1" min="0.5" max="5" step="0.5" value="2">
+                        <input type="number" id="speedInput1" min="0.5" max="5" step="0.5" value="2">
+                        <span class="value-display" id="speed1Value">2.0</span>
+                        <span>x</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Horizontal Bounce Window -->
+            <div class="window">
+                <div class="window-title">⬅️➡️ Horizontal Bounce</div>
+                <div class="window-description">
+                    Circle bounces from left to right. Simulates horizontal movement with rubber-banding effects.
+                </div>
+                <div class="canvas-container">
+                    <canvas id="canvas2" width="300" height="300"></canvas>
+                </div>
+                <div class="window-controls">
+                    <div class="delay-control">
+                        <label for="delay2">Ping Delay:</label>
+                        <input type="range" id="delay2" min="1" max="9999" value="100">
+                        <input type="number" id="delayInput2" min="1" max="9999" value="100">
+                        <span class="value-display" id="delay2Value">100</span>
+                        <span>ms</span>
+                    </div>
+                    <div class="delay-control" style="margin-top: 10px;">
+                        <label for="speed2">Speed:</label>
+                        <input type="range" id="speed2" min="0.5" max="5" step="0.5" value="2">
+                        <input type="number" id="speedInput2" min="0.5" max="5" step="0.5" value="2">
+                        <span class="value-display" id="speed2Value">2.0</span>
+                        <span>x</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rotation Window -->
+            <div class="window">
+                <div class="window-title">🔄 Rotation</div>
+                <div class="window-description">
+                    Stick rotates continuously. Simulates turning/aiming responsiveness with input delay.
+                </div>
+                <div class="canvas-container">
+                    <canvas id="canvas3" width="300" height="300"></canvas>
+                </div>
+                <div class="window-controls">
+                    <div class="delay-control">
+                        <label for="delay3">Ping Delay:</label>
+                        <input type="range" id="delay3" min="1" max="9999" value="100">
+                        <input type="number" id="delayInput3" min="1" max="9999" value="100">
+                        <span class="value-display" id="delay3Value">100</span>
+                        <span>ms</span>
+                    </div>
+                    <div class="delay-control" style="margin-top: 10px;">
+                        <label for="speed3">Speed:</label>
+                        <input type="range" id="speed3" min="0.5" max="5" step="0.5" value="2">
+                        <input type="number" id="speedInput3" min="0.5" max="5" step="0.5" value="2">
+                        <span class="value-display" id="speed3Value">2.0</span>
+                        <span>x</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 How High Ping Ruins Your Gaming Experience:</strong><br><br>
+            <strong>The Problem:</strong> High ping feels like a <strong>frustrating, delayed, or choppy</strong> experience where your actions (moving, shooting) take time to register on the server, causing "lag".<br><br>
+            <strong>What You Experience:</strong><br>
+            • 🔫 <strong>Delayed Hits:</strong> You shoot at enemies but nothing happens immediately<br>
+            • 👻 <strong>Being Shot Before Seeing:</strong> Enemy kills you before they even appear on your screen<br>
+            • 📍 <strong>Rubber-banding:</strong> Character jumps back to previous position suddenly<br>
+            • 🐌 <strong>Slow Response:</strong> Your inputs feel sluggish and unresponsive<br>
+            • 😤 <strong>Unfair Disadvantage:</strong> Low-ping players will always have the advantage<br><br>
+            <strong>The Simulation:</strong> The delay setting represents <strong>ping/latency</strong>. Higher values = more lag = harder to play! Try setting delay to 200ms+ to really feel the frustration of high-ping gaming.
+        </div>
+
+        <footer>
+            <p>Understanding ping impact on gaming experience</p>
+        </footer>
+    </div>
+
+    <script>
+        // Animation state for each window
+        const animationState = {
+            window1: { delay: 100, speed: 2, x: 0, y: 150, velocityY: 2, lastUpdate: 0 },
+            window2: { delay: 100, speed: 2, x: 150, y: 0, velocityX: 2, lastUpdate: 0 },
+            window3: { delay: 100, speed: 2, rotation: 0, lastUpdate: 0, rotationSpeed: 3 }
+        };
+
+        // Canvas contexts
+        const canvases = {
+            canvas1: document.getElementById('canvas1'),
+            canvas2: document.getElementById('canvas2'),
+            canvas3: document.getElementById('canvas3')
+        };
+
+        const contexts = {
+            canvas1: canvases.canvas1.getContext('2d'),
+            canvas2: canvases.canvas2.getContext('2d'),
+            canvas3: canvases.canvas3.getContext('2d')
+        };
+
+        // Get all controls
+        const delayInputs = {
+            delay1: document.getElementById('delay1'),
+            delayInput1: document.getElementById('delayInput1'),
+            delay2: document.getElementById('delay2'),
+            delayInput2: document.getElementById('delayInput2'),
+            delay3: document.getElementById('delay3'),
+            delayInput3: document.getElementById('delayInput3'),
+            global: document.getElementById('globalDelay')
+        };
+
+        const delayValues = {
+            delay1Value: document.getElementById('delay1Value'),
+            delay2Value: document.getElementById('delay2Value'),
+            delay3Value: document.getElementById('delay3Value'),
+            globalValue: document.getElementById('globalDelayValue')
+        };
+
+        // Button controls
+        const syncAllDelayBtn = document.getElementById('syncAllDelayBtn');
+        const syncAllSpeedBtn = document.getElementById('syncAllSpeedBtn');
+        const resetAllBtn = document.getElementById('resetAllBtn');
+
+        // Setup delay input synchronization (range and number inputs)
+        function setupDelaySync(rangeId, numberId, valueId) {
+            const rangeInput = document.getElementById(rangeId);
+            const numberInput = document.getElementById(numberId);
+            const valueDisplay = document.getElementById(valueId);
+
+            const syncValue = (value) => {
+                value = Math.max(1, Math.min(9999, parseInt(value) || 1));
+                rangeInput.value = value;
+                numberInput.value = value;
+                valueDisplay.textContent = value;
+                
+                // Update animation state
+                const windowKey = rangeId.includes('1') ? 'window1' : 
+                                 rangeId.includes('2') ? 'window2' : 'window3';
+                animationState[windowKey].delay = value;
+            };
+
+            rangeInput.addEventListener('input', (e) => syncValue(e.target.value));
+            numberInput.addEventListener('change', (e) => syncValue(e.target.value));
+        }
+
+        // Setup speed input synchronization
+        function setupSpeedSync(rangeId, numberId, valueId) {
+            const rangeInput = document.getElementById(rangeId);
+            const numberInput = document.getElementById(numberId);
+            const valueDisplay = document.getElementById(valueId);
+
+            const syncValue = (value) => {
+                value = Math.max(0.5, Math.min(5, parseFloat(value) || 0.5));
+                rangeInput.value = value;
+                numberInput.value = value;
+                valueDisplay.textContent = value.toFixed(1);
+                
+                // Update animation state
+                const windowKey = rangeId.includes('1') ? 'window1' : 
+                                 rangeId.includes('2') ? 'window2' : 'window3';
+                animationState[windowKey].speed = value;
+            };
+
+            rangeInput.addEventListener('input', (e) => syncValue(e.target.value));
+            numberInput.addEventListener('change', (e) => syncValue(e.target.value));
+        }
+
+        // Setup all delay controls
+        setupDelaySync('delay1', 'delayInput1', 'delay1Value');
+        setupDelaySync('delay2', 'delayInput2', 'delay2Value');
+        setupDelaySync('delay3', 'delayInput3', 'delay3Value');
+
+        // Setup all speed controls
+        setupSpeedSync('speed1', 'speedInput1', 'speed1Value');
+        setupSpeedSync('speed2', 'speedInput2', 'speed2Value');
+        setupSpeedSync('speed3', 'speedInput3', 'speed3Value');
+
+        // Global delay control
+        delayInputs.global.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            delayValues.globalValue.textContent = value;
+        });
+
+        // Global speed control
+        const globalSpeedInput = document.getElementById('globalSpeed');
+        const globalSpeedValue = document.getElementById('globalSpeedValue');
+        globalSpeedInput.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            globalSpeedValue.textContent = value.toFixed(1);
+        });
+
+        // Sync all delays to global delay
+        syncAllDelayBtn.addEventListener('click', () => {
+            const globalValue = parseInt(delayInputs.global.value);
+            
+            document.getElementById('delay1').value = globalValue;
+            document.getElementById('delayInput1').value = globalValue;
+            delayValues.delay1Value.textContent = globalValue;
+            animationState.window1.delay = globalValue;
+
+            document.getElementById('delay2').value = globalValue;
+            document.getElementById('delayInput2').value = globalValue;
+            delayValues.delay2Value.textContent = globalValue;
+            animationState.window2.delay = globalValue;
+
+            document.getElementById('delay3').value = globalValue;
+            document.getElementById('delayInput3').value = globalValue;
+            delayValues.delay3Value.textContent = globalValue;
+            animationState.window3.delay = globalValue;
+        });
+
+        // Sync all speeds to global speed
+        syncAllSpeedBtn.addEventListener('click', () => {
+            const globalValue = parseFloat(globalSpeedInput.value);
+            
+            document.getElementById('speed1').value = globalValue;
+            document.getElementById('speedInput1').value = globalValue;
+            document.getElementById('speed1Value').textContent = globalValue.toFixed(1);
+            animationState.window1.speed = globalValue;
+
+            document.getElementById('speed2').value = globalValue;
+            document.getElementById('speedInput2').value = globalValue;
+            document.getElementById('speed2Value').textContent = globalValue.toFixed(1);
+            animationState.window2.speed = globalValue;
+
+            document.getElementById('speed3').value = globalValue;
+            document.getElementById('speedInput3').value = globalValue;
+            document.getElementById('speed3Value').textContent = globalValue.toFixed(1);
+            animationState.window3.speed = globalValue;
+        });
+
+        // Reset all to defaults
+        resetAllBtn.addEventListener('click', () => {
+            const defaultDelay = 100;
+            const defaultSpeed = 2;
+            
+            delayInputs.global.value = defaultDelay;
+            delayValues.globalValue.textContent = defaultDelay;
+            globalSpeedInput.value = defaultSpeed;
+            globalSpeedValue.textContent = defaultSpeed.toFixed(1);
+
+            document.getElementById('delay1').value = defaultDelay;
+            document.getElementById('delayInput1').value = defaultDelay;
+            delayValues.delay1Value.textContent = defaultDelay;
+            animationState.window1.delay = defaultDelay;
+            document.getElementById('speed1').value = defaultSpeed;
+            document.getElementById('speedInput1').value = defaultSpeed;
+            document.getElementById('speed1Value').textContent = defaultSpeed.toFixed(1);
+            animationState.window1.speed = defaultSpeed;
+
+            document.getElementById('delay2').value = defaultDelay;
+            document.getElementById('delayInput2').value = defaultDelay;
+            delayValues.delay2Value.textContent = defaultDelay;
+            animationState.window2.delay = defaultDelay;
+            document.getElementById('speed2').value = defaultSpeed;
+            document.getElementById('speedInput2').value = defaultSpeed;
+            document.getElementById('speed2Value').textContent = defaultSpeed.toFixed(1);
+            animationState.window2.speed = defaultSpeed;
+
+            document.getElementById('delay3').value = defaultDelay;
+            document.getElementById('delayInput3').value = defaultDelay;
+            delayValues.delay3Value.textContent = defaultDelay;
+            animationState.window3.delay = defaultDelay;
+            document.getElementById('speed3').value = defaultSpeed;
+            document.getElementById('speedInput3').value = defaultSpeed;
+            document.getElementById('speed3Value').textContent = defaultSpeed.toFixed(1);
+            animationState.window3.speed = defaultSpeed;
+        });
+
+        // Drawing functions
+        function drawVerticalBounce(ctx, state) {
+            const canvas = ctx.canvas;
+            const centerX = canvas.width / 2;
+            const radius = 30;
+
+            // Clear canvas
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Update position with delay
+            const now = Date.now();
+            if (now - state.lastUpdate >= state.delay) {
+                state.y += state.velocityY * state.speed;
+                
+                // Bounce at edges
+                if (state.y - radius <= 0 || state.y + radius >= canvas.height) {
+                    state.velocityY *= -1;
+                }
+                
+                state.lastUpdate = now;
+            }
+
+            // Draw circle
+            ctx.fillStyle = '#667eea';
+            ctx.beginPath();
+            ctx.arc(centerX, state.y, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw border
+            ctx.strokeStyle = '#764ba2';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw guide lines
+            ctx.strokeStyle = '#e9ecef';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawHorizontalBounce(ctx, state) {
+            const canvas = ctx.canvas;
+            const centerY = canvas.height / 2;
+            const radius = 30;
+
+            // Clear canvas
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Update position with delay
+            const now = Date.now();
+            if (now - state.lastUpdate >= state.delay) {
+                state.x += state.velocityX * state.speed;
+                
+                // Bounce at edges
+                if (state.x - radius <= 0 || state.x + radius >= canvas.width) {
+                    state.velocityX *= -1;
+                }
+                
+                state.lastUpdate = now;
+            }
+
+            // Draw circle
+            ctx.fillStyle = '#28a745';
+            ctx.beginPath();
+            ctx.arc(state.x, centerY, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw border
+            ctx.strokeStyle = '#1e7e34';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw guide lines
+            ctx.strokeStyle = '#e9ecef';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawRotation(ctx, state) {
+            const canvas = ctx.canvas;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const stickLength = 80;
+            const stickWidth = 8;
+
+            // Clear canvas
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Update rotation with delay
+            const now = Date.now();
+            if (now - state.lastUpdate >= state.delay) {
+                state.rotation += state.rotationSpeed * state.speed;
+                if (state.rotation >= 360) {
+                    state.rotation = 0;
+                }
+                state.lastUpdate = now;
+            }
+
+            // Save context state
+            ctx.save();
+
+            // Move to center and rotate
+            ctx.translate(centerX, centerY);
+            ctx.rotate((state.rotation * Math.PI) / 180);
+
+            // Draw rotating stick
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(-stickWidth / 2, -stickLength / 2, stickWidth, stickLength);
+
+            // Draw arrow at end
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.moveTo(-stickWidth / 2, -stickLength / 2);
+            ctx.lineTo(stickWidth / 2, -stickLength / 2);
+            ctx.lineTo(0, -stickLength / 2 - 15);
+            ctx.fill();
+
+            // Restore context state
+            ctx.restore();
+
+            // Draw center circle
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw rotation indicator (degrees)
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${Math.round(state.rotation)}°`, centerX, centerY + 40);
+
+            // Draw guide circle
+            ctx.strokeStyle = '#e9ecef';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, stickLength, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // Animation loop
+        function animate() {
+            drawVerticalBounce(contexts.canvas1, animationState.window1);
+            drawHorizontalBounce(contexts.canvas2, animationState.window2);
+            drawRotation(contexts.canvas3, animationState.window3);
+
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        animate();
+
+        // Handle canvas resize for responsiveness
+        function resizeCanvases() {
+            const containers = document.querySelectorAll('.canvas-container');
+            containers.forEach((container, index) => {
+                const canvas = container.querySelector('canvas');
+                const rect = container.getBoundingClientRect();
+                
+                canvas.width = Math.min(rect.width - 4, 400);
+                canvas.height = Math.min(rect.height - 4, 400);
+            });
+        }
+
+        window.addEventListener('resize', resizeCanvases);
+        resizeCanvases();
+    </script>
+</body>
+</html>

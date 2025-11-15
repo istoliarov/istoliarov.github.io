@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PDF Toolbox — From PDF</title>
+  <meta name="description" content="Extract images, text, and Word from PDF — client-side.">
+  <meta name="keywords" content="pdf to images, pdf to text, pdf to docx, pdf toolbox">
+  <link rel="canonical" href="/tools/pdf/from-pdf.html">
+  <meta name="robots" content="index,follow">
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--accent:#667eea;--muted:#666}
+    *{box-sizing:border-box}
+    body{font-family:Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);margin:0;padding:20px 20px 56px;color:#222}
+    .wrap{max-width:1000px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{margin:.2rem 0;font-size:1.4rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+    .card{background:var(--card);border-radius:8px;padding:14px;box-shadow:0 6px 18px rgba(20,20,40,.06)}
+    label{display:block;font-size:.95rem;margin-bottom:8px}
+    .controls{display:flex;gap:8px;align-items:center}
+    button{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+    .dropzone{border:2px dashed #e0e6ff;border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px;cursor:pointer}
+    .dropzone.dragover{background:#eef2ff;border-color:var(--accent)}
+    .progress{width:100%;background:#f0f0f0;border-radius:6px;height:12px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:var(--accent);width:0%}
+    .thumbnails{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .thumb{width:120px;height:160px;background:#fff;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:6px}
+    .thumb img{max-width:100%;max-height:100%}
+    .hint{font-size:.85rem;color:var(--muted);margin-top:8px}
+    a.nav{font-size:.9rem;color:var(--accent);text-decoration:none}
+    /* SEO bar */
+    .seo-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,0.95);font-size:11px;color:#444;padding:6px 12px;border-top:1px solid #eee;display:flex;justify-content:center;align-items:center;z-index:9999}
+    .seo-bar .seo-text{opacity:0.9}
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.4.1/html-docx.js"></script>
+  <meta property="og:title" content="PDF Toolbox — From PDF">
+  <meta property="og:description" content="Extract images and text from PDF directly in the browser.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/tools/pdf/from-pdf.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PDF Toolbox — From PDF">
+  <meta name="twitter:description" content="Extract images and text from PDF directly in the browser.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "PDF Toolbox — From PDF",
+    "description": "Extract images and text from PDF client-side.",
+    "url": "/tools/pdf/from-pdf.html"
+  }
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+      <div class="seo-bar"><span class="seo-text">Description: Extract images, text, and Word from PDF — client-side. &nbsp;|&nbsp; Keywords: pdf to images, pdf to text, pdf to docx</span></div>
+        <h1>From PDF</h1>
+        <div class="hint">PDF → Images, PDF → TXT, PDF → DOCX (text only)</div>
+      </div>
+      <nav>
+        <a class="nav" href="index.html">← Home</a>
+        &nbsp;·&nbsp;
+        <a class="nav" href="to-pdf.html">To PDF →</a>
+      </nav>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <label>PDF → Images (PNG)</label>
+        <div id="pdfImgDrop" class="dropzone">Drop PDF here or <input id="pdfToImagesIn" type="file" accept="application/pdf" style="margin-left:6px"></div>
+        <div class="controls" style="margin-top:10px">
+          <button id="pdfToImagesBtn">Extract pages to images</button>
+          <button id="pdfImagesZipBtn" class="secondary" style="display:none">Download all pages as ZIP</button>
+        </div>
+        <div id="pdfImagesOut" class="hint"></div>
+        <div id="pdfImagesProgress" style="margin-top:8px"></div>
+        <div id="pdfThumbnails" class="thumbnails"></div>
+      </div>
+
+      <div class="card">
+        <label>PDF → Text (.txt)</label>
+        <div id="pdfTextDrop" class="dropzone">Drop PDF here or <input id="pdfToTextIn" type="file" accept="application/pdf" style="margin-left:6px"></div>
+        <div class="controls" style="margin-top:10px">
+          <button id="pdfToTextBtn">Extract text</button>
+        </div>
+        <div id="pdfTextOut" class="hint"></div>
+        <div id="pdfTextProgress" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <label>PDF → Word (.docx)</label>
+        <div id="pdfDocxDrop" class="dropzone">Drop PDF here or <input id="pdfToDocxIn" type="file" accept="application/pdf" style="margin-left:6px"></div>
+        <div class="controls" style="margin-top:10px">
+          <button id="pdfToDocxBtn">Convert PDF → DOCX (text only)</button>
+        </div>
+        <div id="pdfDocxOut" class="hint"></div>
+        <div id="pdfDocxProgress" style="margin-top:8px"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    const JSZip = window.JSZip;
+    function downloadBlob(blob, filename){ const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),10000); }
+    function setProgress(id,pct,text){ const c=document.getElementById(id); c.innerHTML=`<div class="progress"><i style="width:${pct}%"></i></div>` + (text?`<div class="hint">${text}</div>`:''); }
+    function clearProgress(id){ document.getElementById(id).innerHTML=''; }
+    function setupDrop(dropId,inputId,outId){ const drop=document.getElementById(dropId), input=document.getElementById(inputId), out=document.getElementById(outId); ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('dragover')})); ['dragleave','drop','dragend'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('dragover')})); drop.addEventListener('drop', ev=>{ const files=Array.from(ev.dataTransfer.files||[]); if(files.length){ try{ const dt=new DataTransfer(); files.forEach(f=>dt.items.add(f)); input.files=dt.files;}catch(_){} if(out) out.innerHTML=`<span class="hint">${files.length} file(s) selected</span>`; } }); }
+    setupDrop('pdfImgDrop','pdfToImagesIn','pdfImagesOut'); setupDrop('pdfTextDrop','pdfToTextIn','pdfTextOut'); setupDrop('pdfDocxDrop','pdfToDocxIn','pdfDocxOut');
+
+    // pdf -> images
+    let lastPdfImages = [];
+    document.getElementById('pdfToImagesBtn').addEventListener('click', async ()=>{
+      const input=document.getElementById('pdfToImagesIn'); const file=input.files[0]; const out=document.getElementById('pdfImagesOut'); out.innerHTML=''; const thumbs=document.getElementById('pdfThumbnails'); thumbs.innerHTML=''; lastPdfImages=[]; document.getElementById('pdfImagesZipBtn').style.display='none'; if(!file){ out.textContent='Select or drop a PDF file'; return; }
+      try{
+        setProgress('pdfImagesProgress',5,'Loading PDF...'); const arrayBuf=await file.arrayBuffer(); const pdf=await pdfjsLib.getDocument({data:arrayBuf}).promise; out.innerHTML=`<div class="hint">Pages: ${pdf.numPages}</div>`; for(let p=1;p<=pdf.numPages;p++){ setProgress('pdfImagesProgress', Math.round((p/pdf.numPages)*90), `Rendering page ${p}/${pdf.numPages}`); const page=await pdf.getPage(p); const viewport=page.getViewport({scale:1.5}); const canvas=document.createElement('canvas'); const ctx=canvas.getContext('2d'); canvas.width=viewport.width; canvas.height=viewport.height; await page.render({canvasContext:ctx,viewport}).promise; const dataUrl=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=dataUrl; a.download=`page-${p}.png`; a.textContent=`Download page ${p} as PNG`; a.className='download'; out.appendChild(a); out.appendChild(document.createElement('br')); const div=document.createElement('div'); div.className='thumb'; const img=new Image(); img.src=dataUrl; div.appendChild(img); thumbs.appendChild(div); lastPdfImages.push({name:`page-${p}.png`, dataUrl}); }
+        if(lastPdfImages.length) document.getElementById('pdfImagesZipBtn').style.display='inline-block'; clearProgress('pdfImagesProgress');
+      }catch(err){ out.textContent='Error: '+err.message; clearProgress('pdfImagesProgress'); }
+    });
+
+    document.getElementById('pdfImagesZipBtn').addEventListener('click', async ()=>{
+      if(!lastPdfImages.length) return; const zip=new JSZip(); setProgress('pdfImagesProgress',10,'Preparing ZIP...'); for(let i=0;i<lastPdfImages.length;i++){ const it=lastPdfImages[i]; const b=dataURLtoBlob(it.dataUrl); zip.file(it.name,b); setProgress('pdfImagesProgress', Math.round(((i+1)/lastPdfImages.length)*90), `Adding ${it.name}`); } const content=await zip.generateAsync({type:'blob'},meta=>{ setProgress('pdfImagesProgress',90+Math.round(meta.percent/10),`Compressing ${Math.round(meta.percent)}%`); }); downloadBlob(content,'pdf-pages.zip'); clearProgress('pdfImagesProgress'); });
+    function dataURLtoBlob(dataurl){ const arr=dataurl.split(','); const mime=arr[0].match(/:(.*?);/)[1]; const bstr=atob(arr[1]); let n=bstr.length; const u8=new Uint8Array(n); while(n--) u8[n]=bstr.charCodeAt(n); return new Blob([u8],{type:mime}); }
+
+    // pdf -> text
+    document.getElementById('pdfToTextBtn').addEventListener('click', async ()=>{
+      const input=document.getElementById('pdfToTextIn'); const file=input.files[0]; const out=document.getElementById('pdfTextOut'); out.innerHTML=''; if(!file){ out.textContent='Select or drop a PDF file'; return; }
+      try{ setProgress('pdfTextProgress',10,'Loading PDF...'); const arrayBuf=await file.arrayBuffer(); const pdf=await pdfjsLib.getDocument({data:arrayBuf}).promise; let fullText=''; for(let p=1;p<=pdf.numPages;p++){ setProgress('pdfTextProgress', Math.round((p/pdf.numPages)*80), `Extracting page ${p}/${pdf.numPages}`); const page=await pdf.getPage(p); const content=await page.getTextContent(); const strings=content.items.map(i=>i.str); fullText+=strings.join(' ')+'\n\n'; } const blob=new Blob([fullText],{type:'text/plain;charset=utf-8'}); downloadBlob(blob,'pdf-extract.txt'); out.innerHTML='<span class="hint">Extracted — <a href="#" class="download" onclick="return false;">download TXT</a></span>'; out.querySelector('a').addEventListener('click',()=>downloadBlob(blob,'pdf-extract.txt')); }catch(err){ out.textContent='Error: '+err.message; } clearProgress('pdfTextProgress'); });
+
+    // pdf -> docx
+    document.getElementById('pdfToDocxBtn').addEventListener('click', async ()=>{
+      const input=document.getElementById('pdfToDocxIn'); const file=input.files[0]; const out=document.getElementById('pdfDocxOut'); out.innerHTML=''; if(!file){ out.textContent='Select or drop a PDF file'; return; }
+      try{ setProgress('pdfDocxProgress',10,'Loading PDF...'); const arrayBuf=await file.arrayBuffer(); const pdf=await pdfjsLib.getDocument({data:arrayBuf}).promise; let fullHtml='<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>'; for(let p=1;p<=pdf.numPages;p++){ setProgress('pdfDocxProgress', Math.round((p/pdf.numPages)*80), `Processing page ${p}/${pdf.numPages}`); const page=await pdf.getPage(p); const content=await page.getTextContent(); const strings=content.items.map(i=>i.str); const text=strings.join(' '); fullHtml+=`<p>${escapeHtml(text)}</p>`; } fullHtml+='</body></html>'; const converted=window.HTMLDocx.asBlob(fullHtml); downloadBlob(converted,'pdf-to-docx.docx'); out.innerHTML='<span class="hint">Converted — <a href="#" class="download" onclick="return false;">download DOCX</a></span>'; out.querySelector('a').addEventListener('click',()=>downloadBlob(converted,'pdf-to-docx.docx')); }catch(err){ out.textContent='Error: '+err.message; } clearProgress('pdfDocxProgress'); });
+
+    function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  })();
+  </script>
+</body>
+</html>
