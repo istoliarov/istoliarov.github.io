@@ -1,29 +1,116 @@
-COPYRIGHT AND LICENSE
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PDF Toolbox — Copyright & License</title>
+  <meta name="description" content="Copyright and license information for PDF Toolbox.">
+  <meta name="robots" content="index,follow">
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--accent:#667eea;--muted:#666}
+    *{box-sizing:border-box}
+    body{font-family:Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);margin:0;padding:0;color:#222;display:flex;flex-direction:column;min-height:100vh}
+    .navbar{background:#fff;border-bottom:1px solid #eee;padding:12px 20px;position:sticky;top:0;z-index:100}
+    .navbar .nav-content{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+    .navbar h2{margin:0;font-size:1.1rem;color:var(--accent)}
+    .navbar .brand, .navbar .brand:visited, .navbar .brand:active, .navbar .brand:hover{color:inherit;text-decoration:none}
+    .navbar .brand:hover{text-decoration:underline}
+    .navbar-menu{display:flex;gap:16px;align-items:center}
+    .navbar-menu a{text-decoration:none;color:var(--accent);font-size:.95rem}
+    .navbar-menu a:hover{text-decoration:underline}
+    .navbar-menu a.current{font-weight:bold}
+    .navbar-menu-item{position:relative}
+    .tools-dropdown{display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid #eee;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:16px;z-index:1000;min-width:400px}
+    .navbar-menu-item:hover .tools-dropdown{display:block}
+    .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .tool-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;background:#f8f9ff;border:1px solid #eef;border-radius:6px;text-decoration:none;color:#222;cursor:pointer;transition:all 0.3s;font-size:.85rem;text-align:center;min-height:80px}
+    .tool-item:hover{box-shadow:0 4px 12px rgba(102,126,234,.15);transform:translateY(-2px);background:#f0f2ff}
+    .wrap{max-width:900px;margin:20px auto;padding:20px;flex:1;width:calc(100% - 40px)}
+    h1{margin:0 0 8px;font-size:1.4rem}
+    .hint-header{color:var(--muted);font-size:.9rem;margin-bottom:20px}
+    .card{background:var(--card);border-radius:8px;padding:20px;box-shadow:0 6px 18px rgba(20,20,40,.06);margin-bottom:20px}
+    .card h2{margin:24px 0 12px;font-size:1.1rem;color:var(--accent);border-top:2px solid #eee;padding-top:16px}
+    .card h2:first-child{border-top:none;padding-top:0;margin-top:0}
+    .card ul{margin:8px 0;padding-left:24px}
+    .card li{margin:6px 0;line-height:1.6}
+    .card p{margin:8px 0;line-height:1.6}
+    .page-footer{text-align:center;color:#666;font-size:.8rem;padding:12px 20px;border-top:1px solid #eee;position:fixed;left:0;right:0;bottom:50px;background:#fff;z-index:10000}
+    .seo-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,0.98);font-size:11px;color:#444;padding:6px 12px;border-top:1px solid #eee;display:flex;justify-content:center;align-items:center;z-index:9999}
+    .seo-bar .seo-text{opacity:0.9}
+  </style>
+  <meta property="og:title" content="PDF Toolbox — Copyright & License">
+  <meta property="og:description" content="Copyright and license information for PDF Toolbox.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/tools/pdf/COPYRIGHT">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PDF Toolbox — Copyright & License">
+  <meta name="twitter:description" content="Copyright and license information for PDF Toolbox.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "PDF Toolbox — Copyright & License",
+    "description": "Copyright and license information for PDF Toolbox.",
+    "url": "/tools/pdf/COPYRIGHT"
+  }
+  </script>
+  <script src="menu-config.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-content">
+      <h2><a class="brand" href="./">PDF Toolbox</a></h2>
+      <div class="navbar-menu">
+        <a href="./">Main</a>
+        <div class="navbar-menu-item">
+          <a href="javascript:void(0)">Tools ▼</a>
+          <div class="tools-dropdown" id="toolsDropdown"></div>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-Copyright © 2025 Igor Stoliarov. All rights reserved.
+  <div class="wrap">
+    <h1>Copyright & License</h1>
+    <div class="hint-header">Legal information and restrictions for PDF Toolbox</div>
 
-RESTRICTIONS
+    <div class="card">
+      <h2>Copyright Notice</h2>
+      <p><strong>Copyright © 2025 Igor Stoliarov.</strong> All rights reserved.</p>
 
-You may NOT:
-- Modify this software or any part of it
-- Copy this software without explicit written permission
-- Sell or distribute this software for profit
-- Use this software in any commercial product
-- Republish or relicense this software
+      <h2>Restrictions</h2>
+      <p>You may NOT:</p>
+      <ul>
+        <li>Modify this software or any part of it</li>
+        <li>Copy this software without explicit written permission</li>
+        <li>Sell or distribute this software for profit</li>
+        <li>Use this software in any commercial product</li>
+        <li>Republish or relicense this software</li>
+      </ul>
+      <p>Any unauthorized use, modification, copying, or selling of this software is strictly prohibited without the express written agreement of Igor Stoliarov.</p>
 
-Any unauthorized use, modification, copying, or selling of this software is strictly prohibited without the express written agreement of Igor Stoliarov.
+      <h2>Disclaimer</h2>
+      <p><strong>THIS SOFTWARE IS PROVIDED "AS-IS" WITHOUT ANY WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.</strong></p>
+      <p>The author and copyright holder do not take any responsibility for:</p>
+      <ul>
+        <li>Any damage, loss, or harm caused by the use of this software</li>
+        <li>Any data loss or corruption</li>
+        <li>Any errors or omissions in the software</li>
+        <li>Any third-party claims or liabilities</li>
+        <li>Any indirect, incidental, special, or consequential damages</li>
+      </ul>
+      <p>Users assume all risks associated with the use of this software.</p>
 
-DISCLAIMER
+      <h2>Contact</h2>
+      <p>For permissions or inquiries, contact: <strong>Igor Stoliarov</strong></p>
+    </div>
+  </div>
 
-THIS SOFTWARE IS PROVIDED "AS-IS" WITHOUT ANY WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+  <script>
+    populateToolsDropdown();
+  </script>
 
-The author and copyright holder do not take any responsibility for:
-- Any damage, loss, or harm caused by the use of this software
-- Any data loss or corruption
-- Any errors or omissions in the software
-- Any third-party claims or liabilities
-- Any indirect, incidental, special, or consequential damages
-
-Users assume all risks associated with the use of this software.
-
-For permissions or inquiries, contact: Igor Stoliarov
+  <div class="page-footer">Created in 2025 by Igor Stoliarov</div>
+  <div class="seo-bar"><span class="seo-text">Copyright and license information for PDF Toolbox — client-side PDF utilities.</span></div>
+</body>
+</html>
