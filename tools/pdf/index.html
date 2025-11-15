@@ -6,7 +6,7 @@
   <title>PDF Toolbox — Welcome</title>
   <meta name="description" content="PDF Toolbox — convert images, text and Word to PDF and back. Small client-side utilities.">
   <meta name="keywords" content="pdf converter, image to pdf, txt to pdf, docx to pdf, pdf tools">
-  <link rel="canonical" href="/tools/pdf/index.html">
+  <link rel="canonical" href="/tools/pdf/">
   <meta name="robots" content="index,follow">
   <style>
     :root{--accent:#667eea}
@@ -20,12 +20,25 @@
     .navbar-menu a{text-decoration:none;color:var(--accent);font-size:.95rem}
     .navbar-menu a:hover{text-decoration:underline}
     .navbar-menu a.current{font-weight:bold}
-    .wrap{max-width:1000px;margin:20px auto;background:#fff;padding:28px;border-radius:8px;box-shadow:0 8px 24px rgba(20,20,40,.06);flex:1;width:calc(100% - 40px)}
-    h1{margin:0 0 6px;font-size:1.4rem}
-    p.lead{color:#666;margin:0 0 18px}
-    .menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0}
-    a.card{display:block;padding:16px 18px;background:#f8f9ff;border-radius:8px;text-decoration:none;color:#222;border:1px solid #eef}
-    a.card:hover{box-shadow:0 6px 18px rgba(102,126,234,.12)}
+    .navbar-menu-item{position:relative}
+    .tools-dropdown{display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid #eee;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:16px;z-index:1000;min-width:400px}
+    .navbar-menu-item:hover .tools-dropdown{display:block}
+    .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .tool-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;background:#f8f9ff;border:1px solid #eef;border-radius:6px;text-decoration:none;color:#222;cursor:pointer;transition:all 0.3s;font-size:.85rem;text-align:center;min-height:80px}
+    .tool-item:hover{box-shadow:0 4px 12px rgba(102,126,234,.15);transform:translateY(-2px);background:#f0f2ff}
+    .wrap{max-width:1200px;margin:20px auto;padding:28px;flex:1;width:calc(100% - 56px)}
+    h1{margin:0 0 6px;font-size:1.4rem;text-align:center}
+    p.lead{color:#666;margin:0 0 24px;text-align:center}
+    .tags-container{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+    .tag-btn{padding:6px 14px;background:#fff;border:1px solid var(--accent);color:var(--accent);border-radius:20px;cursor:pointer;font-size:.9rem;transition:all 0.3s}
+    .tag-btn:hover{background:var(--accent);color:#fff}
+    .tag-btn.active{background:var(--accent);color:#fff}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;justify-content:center}
+    .ability-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;background:#f8f9ff;border:1px solid #eef;border-radius:8px;text-decoration:none;color:#222;cursor:pointer;transition:all 0.3s;min-height:120px}
+    .ability-card:hover{box-shadow:0 6px 18px rgba(102,126,234,.12);transform:translateY(-2px)}
+    .ability-card.hidden{display:none}
+    .ability-card-title{font-weight:600;font-size:1rem;text-align:center;margin-bottom:6px}
+    .ability-card-desc{font-size:.8rem;color:#666;text-align:center}
     .page-footer{text-align:center;color:#666;font-size:.8rem;padding:12px 20px;border-top:1px solid #eee;position:fixed;left:0;right:0;bottom:50px;background:#fff;z-index:10000}
     /* SEO bar */
     .seo-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,0.98);font-size:11px;color:#444;padding:6px 12px;border-top:1px solid #eee;display:flex;justify-content:center;align-items:center;z-index:9999}
@@ -34,7 +47,7 @@
   <meta property="og:title" content="PDF Toolbox — Client-side PDF converter">
   <meta property="og:description" content="Convert images, text and Word to PDF and back — entirely in your browser. Files stay on your machine.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="/tools/pdf/index.html">
+  <meta property="og:url" content="/tools/pdf/">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="PDF Toolbox — Client-side PDF converter">
   <meta name="twitter:description" content="Convert images, text and Word to PDF and back — entirely in your browser.">
@@ -51,12 +64,13 @@
 <body>
   <nav class="navbar">
     <div class="nav-content">
-      <h2><a class="brand" href="index.html">PDF Toolbox</a></h2>
+      <h2><a class="brand" href="./">PDF Toolbox</a></h2>
       <div class="navbar-menu">
-        <a href="index.html" class="current">Home</a>
-        <a href="to-pdf.html">To PDF</a>
-        <a href="from-pdf.html">From PDF</a>
-        <a href="other.html">Tools</a>
+        <a href="./" class="current">Main</a>
+        <div class="navbar-menu-item">
+          <a href="javascript:void(0)">Tools ▼</a>
+          <div class="tools-dropdown" id="toolsDropdown"></div>
+        </div>
       </div>
     </div>
   </nav>
@@ -65,12 +79,77 @@
     <h1>PDF Toolbox</h1>
     <p class="lead">Simple client-side utilities to convert images, text and Word documents to PDF and to extract images/text back from PDFs. Also sign, watermark, and rotate PDFs. Files never leave your browser.</p>
 
-    <div class="menu">
-      <a class="card" href="to-pdf.html"><strong>To PDF</strong><br><small>Images, TXT, DOCX, PPTX, Excel → PDF</small></a>
-      <a class="card" href="from-pdf.html"><strong>From PDF</strong><br><small>PDF → Images, TXT, DOCX, PPTX, Excel</small></a>
-      <a class="card" href="other.html"><strong>Tools</strong><br><small>Sign, Watermark, Rotate PDFs</small></a>
-    </div>
+    <div class="tags-container" id="tagsContainer"></div>
+
+    <div class="grid" id="abilitiesGrid"></div>
   </div>
+
+  <script>
+  const abilities = [
+    { title: 'Images → PDF', desc: 'Convert images to PDF', tags: ['converter', 'image'], url: 'images-to-pdf' },
+    { title: 'TXT → PDF', desc: 'Convert text to PDF', tags: ['converter', 'text'], url: 'txt-to-pdf' },
+    { title: 'DOCX → PDF', desc: 'Convert Word to PDF', tags: ['converter', 'document'], url: 'docx-to-pdf' },
+    { title: 'PPTX → PDF', desc: 'Convert slides to PDF', tags: ['converter', 'presentation'], url: 'pptx-to-pdf' },
+    { title: 'Excel → PDF', desc: 'Convert spreadsheet to PDF', tags: ['converter', 'spreadsheet'], url: 'excel-to-pdf' },
+    { title: 'PDF → Images', desc: 'Extract pages as images', tags: ['extraction', 'image'], url: 'pdf-to-images' },
+    { title: 'PDF → TXT', desc: 'Extract text from PDF', tags: ['extraction', 'text'], url: 'pdf-to-txt' },
+    { title: 'PDF → DOCX', desc: 'Convert PDF to Word', tags: ['extraction', 'document'], url: 'pdf-to-docx' },
+    { title: 'PDF → PPTX', desc: 'Convert PDF to slides', tags: ['extraction', 'presentation'], url: 'pdf-to-pptx' },
+    { title: 'PDF → Excel', desc: 'Convert PDF to spreadsheet', tags: ['extraction', 'spreadsheet'], url: 'pdf-to-excel' },
+    { title: 'Sign PDF', desc: 'Add digital signature', tags: ['utility', 'security'], url: 'pdf-sign' },
+    { title: 'Watermark', desc: 'Add watermark to PDF', tags: ['utility', 'security'], url: 'pdf-watermark' },
+    { title: 'Rotate PDF', desc: 'Rotate PDF pages', tags: ['utility', 'editing'], url: 'pdf-rotate' }
+  ];
+
+  const allTags = [...new Set(abilities.flatMap(a => a.tags))];
+  let activeTag = null;
+
+  function populateToolsDropdown() {
+    const dropdown = document.getElementById('toolsDropdown');
+    dropdown.innerHTML = '<div class="tools-grid">' + 
+      abilities.map(a => `<a href="${a.url}" class="tool-item">${a.title}</a>`).join('') +
+      '</div>';
+  }
+
+  function renderTags() {
+    const container = document.getElementById('tagsContainer');
+    container.innerHTML = '<button class="tag-btn active" data-tag="all">All</button>' +
+      allTags.map(tag => `<button class="tag-btn" data-tag="${tag}">${tag}</button>`).join('');
+    container.querySelectorAll('.tag-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTag = btn.dataset.tag === 'all' ? null : btn.dataset.tag;
+        filterAbilities();
+      });
+    });
+  }
+
+  function renderAbilities() {
+    const grid = document.getElementById('abilitiesGrid');
+    grid.innerHTML = abilities.map((a, i) => `
+      <a href="${a.url}" class="ability-card" data-tags="${a.tags.join(' ')}" data-index="${i}">
+        <div class="ability-card-title">${a.title}</div>
+        <div class="ability-card-desc">${a.desc}</div>
+      </a>
+    `).join('');
+  }
+
+  function filterAbilities() {
+    const cards = document.querySelectorAll('.ability-card');
+    cards.forEach(card => {
+      if (!activeTag) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.toggle('hidden', !card.dataset.tags.includes(activeTag));
+      }
+    });
+  }
+
+  populateToolsDropdown();
+  renderTags();
+  renderAbilities();
+  </script>
 
   <div class="page-footer">Created in 2025 by Igor Stoliarov<br><small><a href="COPYRIGHT" style="color:#666;text-decoration:none;font-size:.75rem">© Copyright & License</a></small></div>
   <div class="seo-bar"><span class="seo-text">Description: PDF Toolbox — convert images, text and Word to PDF and back. Files never leave your browser. &nbsp;|&nbsp; Keywords: pdf converter, image to pdf, txt to pdf, docx to pdf</span></div>

@@ -1,0 +1,238 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Text to PDF вЂ” PDF Toolbox</title>
+  <meta name="description" content="Convert plain text (.txt) to PDF. Customize font size. No upload, files stay local.">
+  <meta name="keywords" content="txt to pdf, text to pdf, plain text converter">
+  <link rel="canonical" href="/tools/pdf/txt-to-pdf/">
+  <meta name="robots" content="index,follow">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root{--accent:#667eea}
+    body{font-family:Segoe UI,Roboto,Arial,sans-serif;background:#f6f7fb;margin:0;padding:0;color:#222;display:flex;flex-direction:column;min-height:100vh}
+    .navbar{background:#fff;border-bottom:1px solid #eee;padding:12px 20px;position:sticky;top:0;z-index:100}
+    .navbar .nav-content{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+    .navbar h2{margin:0;font-size:1.1rem;color:var(--accent)}
+    .navbar .brand, .navbar .brand:visited, .navbar .brand:active, .navbar .brand:hover{color:inherit;text-decoration:none}
+    .navbar .brand:hover{text-decoration:underline}
+    .navbar-menu{display:flex;gap:16px;align-items:center}
+    .navbar-menu a{text-decoration:none;color:var(--accent);font-size:.95rem}
+    .navbar-menu a:hover{text-decoration:underline}
+    .navbar-menu a.current{font-weight:bold}
+    .navbar-menu-item{position:relative}
+    .tools-dropdown{display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid #eee;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:16px;z-index:1000;min-width:400px}
+    .navbar-menu-item:hover .tools-dropdown{display:block}
+    .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .tool-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;background:#f8f9ff;border:1px solid #eef;border-radius:6px;text-decoration:none;color:#222;cursor:pointer;transition:all 0.3s;font-size:.85rem;text-align:center;min-height:80px}
+    .tool-item:hover{box-shadow:0 4px 12px rgba(102,126,234,.15);transform:translateY(-2px);background:#f0f2ff}
+    .wrap{max-width:1200px;margin:20px auto;padding:28px;flex:1;width:calc(100% - 56px)}
+    h1{margin:0 0 6px;font-size:1.4rem}
+    p.lead{color:#666;margin:0 0 24px}
+    .drop-area{border:2px dashed var(--accent);border-radius:8px;padding:40px;text-align:center;background:#f9f9ff;margin-bottom:24px;cursor:pointer;transition:all 0.3s}
+    .drop-area:hover{background:#f0f2ff;border-color:#764ba2}
+    .drop-area.highlight{background:#e8eaff;border-color:#764ba2}
+    input[type="file"]{display:none}
+    .file-input-label{cursor:pointer;display:inline-block}
+    .controls{display:flex;gap:12px;margin-bottom:24px;align-items:center;flex-wrap:wrap}
+    .btn{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.95rem;transition:all 0.3s}
+    .btn:hover{background:#764ba2}
+    .btn:disabled{opacity:0.5;cursor:not-allowed}
+    .progress-bar{width:100%;height:20px;background:#eee;border-radius:4px;margin-bottom:12px;overflow:hidden;display:none}
+    .progress-fill{height:100%;background:var(--accent);transition:width 0.3s;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+    input[type="number"]{padding:6px;border:1px solid #ddd;border-radius:4px;width:80px}
+    textarea{width:100%;height:300px;padding:12px;border:1px solid #ddd;border-radius:4px;font-family:monospace;font-size:.9rem;resize:vertical}
+    .page-footer{text-align:center;color:#666;font-size:.8rem;padding:12px 20px;border-top:1px solid #eee;position:fixed;left:0;right:0;bottom:50px;background:#fff;z-index:10000}
+    .seo-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,0.98);font-size:11px;color:#444;padding:6px 12px;border-top:1px solid #eee;display:flex;justify-content:center;align-items:center;z-index:9999}
+    .seo-bar .seo-text{opacity:0.9}
+  </style>
+  <meta property="og:title" content="Text to PDF вЂ” PDF Toolbox">
+  <meta property="og:description" content="Convert plain text (.txt) to PDF. Customize font size. No upload, files stay local.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/tools/pdf/txt-to-pdf/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Text to PDF вЂ” PDF Toolbox">
+  <meta name="twitter:description" content="Convert .txt files to PDF with custom font size.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Text to PDF",
+    "description": "Convert plain text to PDF with customizable font size",
+    "url": "/tools/pdf/txt-to-pdf/"
+  }
+  </script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-content">
+      <h2><a class="brand" href="../">PDF Toolbox</a></h2>
+      <div class="navbar-menu">
+                <a href="../">Main</a>
+        <div class="navbar-menu-item">
+          <a href="javascript:void(0)">Tools </a>
+          <div class="tools-dropdown" id="toolsDropdown"></div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <h1>Text to PDF</h1>
+    <p class="lead">Convert plain text (.txt) files to PDF with customizable font size. Files never leave your browser.</p>
+
+    <div class="drop-area" id="dropArea">
+      <label class="file-input-label">
+        <input type="file" id="txtInput" accept=".txt,text/plain">
+        <div>рџ“„ Drop TXT file here or click to select</div>
+      </label>
+    </div>
+
+    <div class="controls">
+      <label for="fontSize">Font size:</label>
+      <input type="number" id="fontSize" value="12" min="6" max="36">
+      <button class="btn" id="convertBtn" disabled>Convert to PDF</button>
+    </div>
+
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-fill" id="progressFill">0%</div>
+    </div>
+
+    <div id="output" style="color:#666;font-size:.9rem;margin-bottom:24px"></div>
+
+    <textarea id="preview" placeholder="Text preview will appear here..." readonly></textarea>
+  </div>
+
+  <script>
+  const { jsPDF } = window.jspdf;
+  const dropArea = document.getElementById('dropArea');
+  const txtInput = document.getElementById('txtInput');
+  const fontSize = document.getElementById('fontSize');
+  const convertBtn = document.getElementById('convertBtn');
+  const progressBar = document.getElementById('progressBar');
+  const progressFill = document.getElementById('progressFill');
+  const preview = document.getElementById('preview');
+  const output = document.getElementById('output');
+  let fileData = null;
+  let fileName = '';
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
+  });
+
+  dropArea.addEventListener('drop', handleDrop, false);
+  txtInput.addEventListener('change', (e) => {
+    handleFileSelect(e.target.files[0]);
+  });
+
+  function handleDrop(e) {
+    const files = e.dataTransfer.files;
+    if (files.length) handleFileSelect(files[0]);
+  }
+
+  async function handleFileSelect(file) {
+    if (!file) return;
+    
+    fileName = file.name.replace('.txt', '.pdf');
+    progressBar.style.display = 'block';
+    progressFill.style.width = '30%';
+    progressFill.textContent = '30%';
+    
+    try {
+      fileData = await file.text();
+      preview.value = fileData.substring(0, 500) + (fileData.length > 500 ? '\n\n...' : '');
+      output.innerHTML = '<span style="color:#28a745">вњ“ File loaded. Ready to convert.</span>';
+      convertBtn.disabled = false;
+      progressBar.style.display = 'none';
+    } catch (err) {
+      output.innerHTML = '<span style="color:#dc3545">Error reading file: ' + err.message + '</span>';
+      progressBar.style.display = 'none';
+    }
+  }
+
+  convertBtn.addEventListener('click', () => {
+    if (!fileData) return;
+    
+    progressBar.style.display = 'block';
+    progressFill.style.width = '50%';
+    progressFill.textContent = '50%';
+    
+    try {
+      const size = Math.max(6, Math.min(36, parseInt(fontSize.value) || 12));
+      const pdf = new jsPDF({unit:'pt', format:'a4'});
+      const margin = 40;
+      const lineHeight = size * 1.2;
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      
+      pdf.setFontSize(size);
+      const lines = pdf.splitTextToSize(fileData, pageW - margin * 2);
+      let cursorY = margin;
+      
+      progressFill.style.width = '70%';
+      progressFill.textContent = '70%';
+      
+      for (let i = 0; i < lines.length; i++) {
+        if (cursorY + lineHeight > pageH - margin) {
+          pdf.addPage();
+          cursorY = margin;
+        }
+        pdf.text(lines[i], margin, cursorY);
+        cursorY += lineHeight;
+      }
+      
+      progressFill.style.width = '90%';
+      progressFill.textContent = '90%';
+      
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      output.innerHTML = '<span style="color:#28a745">вњ“ PDF converted and downloaded successfully!</span>';
+      progressFill.style.width = '100%';
+      progressFill.textContent = '100%';
+      setTimeout(() => {
+        progressBar.style.display = 'none';
+      }, 1000);
+    } catch (err) {
+      output.innerHTML = '<span style="color:#dc3545">Error converting: ' + err.message + '</span>';
+      progressBar.style.display = 'none';
+    }
+  });
+  </script>
+
+  <div class="page-footer">Created in 2025 by Igor Stoliarov<br><small><a href="../COPYRIGHT" style="color:#666;text-decoration:none;font-size:.75rem">В© Copyright & License</a></small></div>
+  <div class="seo-bar"><span class="seo-text">Convert plain text (.txt) to PDF with custom font size. No upload, files stay local. &nbsp;|&nbsp; Keywords: txt to pdf, text to pdf, plain text converter</span></div>
+  <script>
+const abilities = [{title:'Images  PDF',url:'../images-to-pdf'},{title:'TXT  PDF',url:'../txt-to-pdf'},{title:'DOCX  PDF',url:'../docx-to-pdf'},{title:'PPTX  PDF',url:'../pptx-to-pdf'},{title:'Excel  PDF',url:'../excel-to-pdf'},{title:'PDF  Images',url:'../pdf-to-images'},{title:'PDF  TXT',url:'../pdf-to-txt'},{title:'PDF  DOCX',url:'../pdf-to-docx'},{title:'PDF  PPTX',url:'../pdf-to-pptx'},{title:'PDF  Excel',url:'../pdf-to-excel'},{title:'Sign PDF',url:'../pdf-sign'},{title:'Watermark',url:'../pdf-watermark'},{title:'Rotate PDF',url:'../pdf-rotate'}];
+const dropdown = document.getElementById('toolsDropdown');
+if(dropdown){dropdown.innerHTML='<div class="tools-grid">' + abilities.map(a=><a href="" class="tool-item"></a>).join('') + '</div>';}
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
