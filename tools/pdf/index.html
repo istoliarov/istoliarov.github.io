@@ -107,7 +107,7 @@
   function populateToolsDropdown() {
     const dropdown = document.getElementById('toolsDropdown');
     dropdown.innerHTML = '<div class="tools-grid">' + 
-      abilities.map(a => `<a href="${a.url}" class="tool-item">${a.title}</a>`).join('') +
+      abilities.map(a => `<a href="${a.url}/" class="tool-item">${a.title}</a>`).join('') +
       '</div>';
   }
 
@@ -128,7 +128,7 @@
   function renderAbilities() {
     const grid = document.getElementById('abilitiesGrid');
     grid.innerHTML = abilities.map((a, i) => `
-      <a href="${a.url}" class="ability-card" data-tags="${a.tags.join(' ')}" data-index="${i}">
+      <a href="${a.url}/" class="ability-card" data-tags="${a.tags.join(' ')}" data-index="${i}">
         <div class="ability-card-title">${a.title}</div>
         <div class="ability-card-desc">${a.desc}</div>
       </a>
@@ -149,120 +149,6 @@
   populateToolsDropdown();
   renderTags();
   renderAbilities();
-  
-  // SPA behavior: load tools inline without full page reload
-  function bindAbilityHandlers(){
-    const grid = document.getElementById('abilitiesGrid');
-    const dropdown = document.getElementById('toolsDropdown');
-
-    // Delegate click on ability cards
-    grid.addEventListener('click', e => {
-      const a = e.target.closest('a.ability-card');
-      if(!a) return;
-      e.preventDefault();
-      const url = a.getAttribute('href') || a.dataset.url;
-      if(url) loadAbility(url);
-    });
-
-    // Delegate click on dropdown tool items
-    dropdown.addEventListener('click', e => {
-      const a = e.target.closest('a.tool-item');
-      if(!a) return;
-      e.preventDefault();
-      const url = a.getAttribute('href') || a.dataset.url;
-      if(url) loadAbility(url);
-    });
-
-    // Main / brand links -> return to grid
-    document.querySelectorAll('.navbar-menu a, .brand').forEach(el => {
-      el.addEventListener('click', ev => {
-        const href = el.getAttribute('href');
-        if(href === './' || href === '../' || href === './index.html' || href === '#'){
-          ev.preventDefault();
-          showMain(true);
-        }
-      });
-    });
-  }
-
-  function showMain(push){
-    const grid = document.getElementById('abilitiesGrid');
-    const tags = document.getElementById('tagsContainer');
-    if(grid) grid.style.display = '';
-    if(tags) tags.style.display = '';
-    const toolView = document.getElementById('toolView');
-    if(toolView) toolView.remove();
-    document.title = 'PDF Toolbox — Welcome';
-    if(push) history.pushState({}, '', './');
-  }
-
-  async function loadAbility(path, pushState = true){
-    const grid = document.getElementById('abilitiesGrid');
-    const tags = document.getElementById('tagsContainer');
-    if(grid) grid.style.display = 'none';
-    if(tags) tags.style.display = 'none';
-
-    // Create or reuse tool view container
-    let view = document.getElementById('toolView');
-    if(!view){
-      view = document.createElement('div');
-      view.id = 'toolView';
-      document.querySelector('.wrap').after(view);
-    }
-    view.innerHTML = '<div style="padding:24px;text-align:center;color:#666">Loading…</div>';
-
-    try{
-      const resp = await fetch(path + '/index.html');
-      if(!resp.ok) throw new Error('HTTP ' + resp.status);
-      const text = await resp.text();
-      const doc = new DOMParser().parseFromString(text, 'text/html');
-      // Prefer the .wrap content from the tool page, fallback to body
-      const newWrap = doc.querySelector('.wrap') || doc.body;
-      view.innerHTML = newWrap.innerHTML;
-
-      // Update document title if available
-      const newTitle = doc.querySelector('title');
-      if(newTitle) document.title = newTitle.textContent;
-
-      // Update canonical link (if present in head of current page)
-      const canonical = doc.querySelector('link[rel="canonical"]');
-      if(canonical){
-        let headCanon = document.querySelector('link[rel="canonical"]');
-        if(!headCanon){
-          headCanon = document.createElement('link'); headCanon.rel = 'canonical'; document.head.appendChild(headCanon);
-        }
-        headCanon.href = canonical.getAttribute('href');
-      }
-
-      // Execute scripts from fetched document (both inline and external)
-      const scripts = Array.from(doc.querySelectorAll('script'));
-      for(const s of scripts){
-        const sc = document.createElement('script');
-        if(s.src){
-          sc.src = s.src;
-          sc.async = false;
-          document.body.appendChild(sc);
-        } else {
-          try{ sc.text = s.textContent; document.body.appendChild(sc); }catch(e){}
-        }
-      }
-
-      if(pushState) history.pushState({tool: path}, '', path + '/');
-    } catch(err){
-      view.innerHTML = '<div style="padding:24px;color:#a00">Error loading tool: ' + err.message + '</div>';
-    }
-  }
-
-  // Handle back/forward navigation
-  window.addEventListener('popstate', (e) => {
-    if(!e.state || !e.state.tool) {
-      showMain(false);
-    } else {
-      loadAbility(e.state.tool, false);
-    }
-  });
-
-  bindAbilityHandlers();
   </script>
 
   <div class="page-footer">Created in 2025 by Igor Stoliarov<br><small><a href="COPYRIGHT" style="color:#666;text-decoration:none;font-size:.75rem">© Copyright & License</a></small></div>
