@@ -192,6 +192,9 @@
     if(tags) tags.style.display = '';
     const toolView = document.getElementById('toolView');
     if(toolView) toolView.remove();
+    // Remove tool styles when returning to main
+    const oldToolStyle = document.getElementById('toolViewStyles');
+    if(oldToolStyle) oldToolStyle.remove();
     document.title = 'PDF Toolbox — Welcome';
     if(push) history.pushState({}, '', './');
   }
@@ -202,6 +205,10 @@
     if(grid) grid.style.display = 'none';
     if(tags) tags.style.display = 'none';
 
+    // Remove old tool styles
+    const oldToolStyle = document.getElementById('toolViewStyles');
+    if(oldToolStyle) oldToolStyle.remove();
+
     // Create or reuse tool view container
     let view = document.getElementById('toolView');
     if(!view){
@@ -209,6 +216,7 @@
       view.id = 'toolView';
       document.querySelector('.wrap').after(view);
     }
+    view.className = 'wrap'; // Ensure wrap class is always applied
     view.innerHTML = '<div style="padding:24px;text-align:center;color:#666">Loading…</div>';
 
     try{
@@ -216,6 +224,16 @@
       if(!resp.ok) throw new Error('HTTP ' + resp.status);
       const text = await resp.text();
       const doc = new DOMParser().parseFromString(text, 'text/html');
+      
+      // Extract and inject styles from the tool page
+      const styles = Array.from(doc.querySelectorAll('style'));
+      if(styles.length > 0){
+        const styleEl = document.createElement('style');
+        styleEl.id = 'toolViewStyles';
+        styleEl.textContent = styles.map(s => s.textContent).join('\n');
+        document.head.appendChild(styleEl);
+      }
+
       // Prefer the .wrap content from the tool page, fallback to body
       const newWrap = doc.querySelector('.wrap') || doc.body;
       view.innerHTML = newWrap.innerHTML;
