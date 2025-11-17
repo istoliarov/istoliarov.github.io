@@ -8,6 +8,7 @@
   <meta name="keywords" content="pdf to images, pdf to png, extract pdf pages, pdf converter">
   <link rel="canonical" href="/tools/pdf/pdf-to-images/">
   <meta name="robots" content="index,follow">
+  <link rel="stylesheet" href="../styles.css">
   <style>
     :root{--bg:#f6f7fb;--card:#fff;--accent:#667eea;--muted:#666;--error:#e74c3c;--success:#27ae60}
     *{box-sizing:border-box}
@@ -83,21 +84,11 @@
   </script>
   <script src="../menu-config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="../menu-config.js"></script>
+  <script src="../navbar.js"></script>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-content">
-      <h2><a class="brand" href="../">PDF Toolbox</a></h2>
-      <div class="navbar-menu">
-        <a href="../">Main</a>
-        <div class="navbar-menu-item">
-          <a href="javascript:void(0)">Tools ▼</a>
-          <div class="tools-dropdown" id="toolsDropdown"></div>
-        </div>
-      </div>
-    </div>
-  </nav>
+  <div id="navbar-container"></div>
 
   <div class="wrap">
     <h1>PDF to Images</h1>
@@ -160,7 +151,7 @@
     const thumbnails = document.getElementById('thumbnails');
 
     // Populate tools dropdown
-    populateToolsDropdown('../');
+    populateToolsDropdown();
 
     // Utility functions
     function downloadBlob(blob, filename) {

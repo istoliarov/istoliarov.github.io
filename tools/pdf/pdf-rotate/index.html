@@ -8,6 +8,7 @@
   <meta name="keywords" content="rotate pdf, pdf rotation, pdf pages, pdf tools">
   <link rel="canonical" href="/tools/pdf/pdf-rotate/">
   <meta name="robots" content="index,follow">
+  <link rel="stylesheet" href="../styles.css">
   <style>
     :root{--bg:#f6f7fb;--card:#fff;--accent:#667eea;--muted:#666;--error:#e74c3c;--success:#27ae60}
     *{box-sizing:border-box}
@@ -88,22 +89,12 @@
   }
   </script>
   <script src="../menu-config.js"></script>
+  <script src="../navbar.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-content">
-      <h2><a class="brand" href="../">PDF Toolbox</a></h2>
-      <div class="navbar-menu">
-        <a href="../">Main</a>
-        <div class="navbar-menu-item">
-          <a href="javascript:void(0)">Tools ▼</a>
-          <div class="tools-dropdown" id="toolsDropdown"></div>
-        </div>
-      </div>
-    </div>
-  </nav>
+  <div id="navbar-container"></div>
 
   <div class="wrap">
     <h1>Rotate PDF</h1>
@@ -160,7 +151,7 @@
   </div>
 
   <script>
-  (function(){
+  (function() {
     const { jsPDF } = window.jspdf;
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -188,7 +179,7 @@
     const clearSelectionBtn = document.getElementById('clearSelectionBtn');
 
     // Populate tools dropdown
-    populateToolsDropdown('../');
+    populateToolsDropdown();
 
     // Quick action buttons
     rotateAllClockwise.addEventListener('click', () => {
