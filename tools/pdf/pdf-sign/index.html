@@ -10,7 +10,7 @@
   <meta name="robots" content="index,follow">
   <link rel="stylesheet" href="../styles.css">
   <style>
-    /* Tool-specific overrides */
+    /* Tool-specific overrides (do not override .card) */
     .signature-input-group{margin-top:16px;border-top:1px solid #eee;padding-top:16px}
     .signature-input-group label{margin-bottom:8px}
     .signature-text-input{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:.95rem;font-family:Arial,sans-serif}
@@ -82,6 +82,15 @@
           </div>
         </div>
 
+        <div id="signPreviewContainer" class="sign-preview-container" style="display:none">
+          <div class="sign-preview-label">Preview & Position Signature</div>
+          <div class="sign-preview-canvas-wrap">
+            <canvas id="pdfPreviewCanvas" class="sign-preview-canvas"></canvas>
+            <canvas id="signatureOverlayCanvas" class="sign-preview-overlay"></canvas>
+          </div>
+          <div class="sign-preview-hint">Drag the signature to position it on the page.<br>Touch and hold to move on mobile.</div>
+        </div>
+
         <div class="position-controls">
           <div>
             <label for="signaturePage">Page:</label>
@@ -98,6 +107,7 @@
               <option value="top-right">Top Right</option>
               <option value="top-left">Top Left</option>
               <option value="center">Center</option>
+              <option value="custom">Custom (dragged)</option>
             </select>
           </div>
         </div>
@@ -151,17 +161,18 @@
     function initSignatureCanvas() {
       signatureCanvas = document.getElementById('signatureCanvas');
       signatureCtx = signatureCanvas.getContext('2d');
-      
-      // Set canvas resolution
+      // Set canvas resolution (account for devicePixelRatio)
       const rect = signatureCanvas.getBoundingClientRect();
-      signatureCanvas.width = rect.width;
-      signatureCanvas.height = rect.height;
-
+      const dpr = window.devicePixelRatio || 1;
+      signatureCanvas.width = Math.round(rect.width * dpr);
+      signatureCanvas.height = Math.round(rect.height * dpr);
+      signatureCanvas.style.width = rect.width + 'px';
+      signatureCanvas.style.height = rect.height + 'px';
+      signatureCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
       signatureCanvas.addEventListener('mousedown', startDrawing);
       signatureCanvas.addEventListener('mousemove', draw);
       signatureCanvas.addEventListener('mouseup', stopDrawing);
       signatureCanvas.addEventListener('mouseout', stopDrawing);
-
       // Touch support
       signatureCanvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
@@ -192,8 +203,8 @@
       if (document.querySelector('input[name="signMode"]:checked').value !== 'draw') return;
       isDrawing = true;
       const rect = signatureCanvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
       signatureCtx.beginPath();
       signatureCtx.moveTo(x, y);
       strokes.push({points: [{x, y}], color: '#000', width: 2});
@@ -202,8 +213,8 @@
     function draw(e) {
       if (!isDrawing || document.querySelector('input[name="signMode"]:checked').value !== 'draw') return;
       const rect = signatureCanvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
       signatureCtx.lineWidth = 2;
       signatureCtx.lineCap = 'round';
       signatureCtx.lineJoin = 'round';
@@ -215,6 +226,189 @@
       }
     }
 
+    document.getElementById('signaturePage').addEventListener('change', () => {
+      renderSignPreview();
+    });
+    document.getElementById('signaturePosition').addEventListener('change', () => {
+      renderSignPreview();
+    });
+
+    // --- Sign Preview Logic ---
+    let overlayDragging = false;
+    let overlayOffsetX = 0;
+    let overlayOffsetY = 0;
+    let overlayX = 0;
+    let overlayY = 0;
+    let overlayWidth = 120;
+    let overlayHeight = 40;
+    let overlayScale = 1;
+    let overlayPageWidth = 0;
+    let overlayPageHeight = 0;
+    let overlayLastTouchId = null;
+
+    async function renderSignPreview() {
+      const previewContainer = document.getElementById('signPreviewContainer');
+      const pdfCanvas = document.getElementById('pdfPreviewCanvas');
+      const overlayCanvas = document.getElementById('signatureOverlayCanvas');
+      if (!pdfDoc) {
+        previewContainer.style.display = 'none';
+        return;
+      }
+      previewContainer.style.display = 'block';
+      const pageSelect = document.getElementById('signaturePage');
+      let pageNum = pageSelect.value === 'last' ? pdfDoc.numPages : parseInt(pageSelect.value);
+      const page = await pdfDoc.getPage(pageNum);
+      const scale = 1.2;
+      const viewport = page.getViewport({ scale });
+      const dpr = window.devicePixelRatio || 1;
+      // Set canvas internal resolution for crisp rendering
+      pdfCanvas.width = Math.round(viewport.width * dpr);
+      pdfCanvas.height = Math.round(viewport.height * dpr);
+      pdfCanvas.style.width = viewport.width + 'px';
+      pdfCanvas.style.height = viewport.height + 'px';
+      overlayCanvas.width = Math.round(viewport.width * dpr);
+      overlayCanvas.height = Math.round(viewport.height * dpr);
+      overlayCanvas.style.width = viewport.width + 'px';
+      overlayCanvas.style.height = viewport.height + 'px';
+      overlayPageWidth = viewport.width;
+      overlayPageHeight = viewport.height;
+        overlayScale = scale;
+        // Render PDF page with DPR-aware context
+        const pdfCtx = pdfCanvas.getContext('2d');
+        pdfCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        await page.render({ canvasContext: pdfCtx, viewport }).promise;
+        // Determine signature image/text
+        let signMode = document.querySelector('input[name="signMode"]:checked').value;
+        let sigImg = null;
+        if (signMode === 'draw' && strokes.length > 0 && signatureCanvas) {
+          sigImg = signatureCanvas.toDataURL('image/png');
+        }
+        // Default overlay size
+        overlayWidth = Math.round(viewport.width * 0.25);
+        overlayHeight = Math.round(viewport.height * 0.08);
+        // Initial position based on selector
+        let pos = document.getElementById('signaturePosition').value;
+        if (pos !== 'custom') {
+          const positions = {
+            'bottom-right': { x: viewport.width - overlayWidth - 16, y: viewport.height - overlayHeight - 16 },
+            'bottom-left': { x: 16, y: viewport.height - overlayHeight - 16 },
+            'top-right': { x: viewport.width - overlayWidth - 16, y: 16 },
+            'top-left': { x: 16, y: 16 },
+            'center': { x: (viewport.width - overlayWidth) / 2, y: (viewport.height - overlayHeight) / 2 }
+          };
+          overlayX = positions[pos].x;
+          overlayY = positions[pos].y;
+        }
+        // Draw overlay
+        drawSignatureOverlay(sigImg);
+        attachOverlayListeners();
+      }
+
+      function drawSignatureOverlay(sigImg) {
+        const overlayCanvas = document.getElementById('signatureOverlayCanvas');
+        const ctx = overlayCanvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        // Clear using device pixels, then set transform so drawing coords are in CSS pixels
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        let signMode = document.querySelector('input[name="signMode"]:checked').value;
+        if (signMode === 'draw' && sigImg) {
+          let img = new window.Image();
+          img.onload = function() {
+            ctx.globalAlpha = 0.95;
+            ctx.drawImage(img, overlayX, overlayY, overlayWidth, overlayHeight);
+            ctx.globalAlpha = 1;
+            drawOverlayBorder(ctx);
+          };
+          img.src = sigImg;
+        } else if (signMode === 'text') {
+          let text = signatureText.value.trim() || 'Signature';
+          ctx.save();
+          ctx.globalAlpha = 0.95;
+          ctx.fillStyle = '#222';
+          ctx.font = `bold ${Math.round(overlayHeight * 0.7)}px Arial`;
+          ctx.textBaseline = 'middle';
+          ctx.textAlign = 'center';
+          ctx.fillText(text, overlayX + overlayWidth / 2, overlayY + overlayHeight / 2, overlayWidth - 8);
+          ctx.restore();
+          drawOverlayBorder(ctx);
+        }
+      }
+
+      function drawOverlayBorder(ctx) {
+        ctx.save();
+        ctx.strokeStyle = 'var(--accent)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.strokeRect(overlayX, overlayY, overlayWidth, overlayHeight);
+        ctx.restore();
+      }
+
+      function overlayPointerDown(e) {
+        let x, y;
+        if (e.touches) {
+          const touch = e.touches[0];
+          x = touch.clientX;
+          y = touch.clientY;
+          overlayLastTouchId = touch.identifier;
+        } else {
+          x = e.clientX;
+          y = e.clientY;
+        }
+        const rect = e.target.getBoundingClientRect();
+        const px = x - rect.left;
+        const py = y - rect.top;
+        if (px >= overlayX && px <= overlayX + overlayWidth && py >= overlayY && py <= overlayY + overlayHeight) {
+          overlayDragging = true;
+          overlayOffsetX = px - overlayX;
+          overlayOffsetY = py - overlayY;
+          e.preventDefault();
+        }
+      }
+      function overlayPointerMove(e) {
+        if (!overlayDragging) return;
+        let x, y;
+        if (e.touches) {
+          const touch = Array.from(e.touches).find(t => t.identifier === overlayLastTouchId) || e.touches[0];
+          x = touch.clientX;
+          y = touch.clientY;
+        } else {
+          x = e.clientX;
+          y = e.clientY;
+        }
+        const rect = e.target.getBoundingClientRect();
+        let px = x - rect.left;
+        let py = y - rect.top;
+        overlayX = Math.max(0, Math.min(px - overlayOffsetX, overlayPageWidth - overlayWidth));
+        overlayY = Math.max(0, Math.min(py - overlayOffsetY, overlayPageHeight - overlayHeight));
+        drawSignatureOverlay(
+          document.querySelector('input[name="signMode"]:checked').value === 'draw' && signatureCanvas && strokes.length > 0
+            ? signatureCanvas.toDataURL('image/png')
+            : null
+        );
+        document.getElementById('signaturePosition').value = 'custom';
+      }
+      function overlayPointerUp(e) {
+        overlayDragging = false;
+        overlayLastTouchId = null;
+      }
+      function overlayPointerLeave(e) {
+        overlayDragging = false;
+        overlayLastTouchId = null;
+      }
+      function attachOverlayListeners() {
+        const overlayCanvas = document.getElementById('signatureOverlayCanvas');
+        overlayCanvas.onmousedown = overlayPointerDown;
+        overlayCanvas.onmousemove = overlayPointerMove;
+        overlayCanvas.onmouseup = overlayPointerUp;
+        overlayCanvas.onmouseleave = overlayPointerLeave;
+        overlayCanvas.ontouchstart = overlayPointerDown;
+        overlayCanvas.ontouchmove = overlayPointerMove;
+        overlayCanvas.ontouchend = overlayPointerUp;
+        overlayCanvas.ontouchcancel = overlayPointerLeave;
+        }
+
     function stopDrawing() {
       isDrawing = false;
     }
@@ -223,6 +417,7 @@
       signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
       strokes = [];
       signatureText.value = '';
+      renderSignPreview();
     });
 
     undoSignatureBtn.addEventListener('click', () => {
@@ -239,7 +434,6 @@
         signatureCtx.lineWidth = stroke.width;
         signatureCtx.lineCap = 'round';
         signatureCtx.lineJoin = 'round';
-        
         if (stroke.points.length > 0) {
           signatureCtx.beginPath();
           signatureCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
@@ -249,6 +443,7 @@
           signatureCtx.stroke();
         }
       });
+      renderSignPreview();
     }
 
     // Signature mode toggle
@@ -441,21 +636,33 @@
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
         const padding = 5;
-        const sigWidth = 40;
-        const sigHeight = 15;
+        let sigWidth = 40;
+        let sigHeight = 15;
 
         let x, y;
-        const positions = {
-          'bottom-right': { x: pageWidth - sigWidth - padding, y: pageHeight - sigHeight - padding },
-          'bottom-left': { x: padding, y: pageHeight - sigHeight - padding },
-          'top-right': { x: pageWidth - sigWidth - padding, y: padding },
-          'top-left': { x: padding, y: padding },
-          'center': { x: (pageWidth - sigWidth) / 2, y: (pageHeight - sigHeight) / 2 }
-        };
-
-        const pos = positions[signaturePos];
-        x = pos.x;
-        y = pos.y;
+        if (signaturePos === 'custom') {
+          // Map overlay coordinates (in preview pixels) to PDF units
+          const previewCanvas = document.getElementById('pdfPreviewCanvas');
+          const previewW = previewCanvas.width / (window.devicePixelRatio || 1);
+          const previewH = previewCanvas.height / (window.devicePixelRatio || 1);
+          const scaleX = pageWidth / previewW;
+          const scaleY = pageHeight / previewH;
+          x = overlayX * scaleX;
+          y = overlayY * scaleY;
+          sigWidth = overlayWidth * scaleX;
+          sigHeight = overlayHeight * scaleY;
+        } else {
+          const positions = {
+            'bottom-right': { x: pageWidth - sigWidth - padding, y: pageHeight - sigHeight - padding },
+            'bottom-left': { x: padding, y: pageHeight - sigHeight - padding },
+            'top-right': { x: pageWidth - sigWidth - padding, y: padding },
+            'top-left': { x: padding, y: padding },
+            'center': { x: (pageWidth - sigWidth) / 2, y: (pageHeight - sigHeight) / 2 }
+          };
+          const pos = positions[signaturePos];
+          x = pos.x;
+          y = pos.y;
+        }
 
         // Set active page for signature
         if (pageNum > 1) {

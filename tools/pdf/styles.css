@@ -1,3 +1,77 @@
+/* PDF Sign Preview UI */
+.sign-preview-container {
+  margin: 24px 0 16px 0;
+  padding: 18px 12px 12px 12px;
+  background: #f8f9ff;
+  border: 1px solid #eef;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 650px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.sign-preview-label {
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 1rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.sign-preview-canvas-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  min-height: 220px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.05);
+  border: 1px solid #ddd;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.sign-preview-canvas {
+  max-width: 600px;
+  width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  display: block;
+  height: auto;
+}
+.sign-preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: move;
+  border-radius: 8px;
+}
+.sign-preview-hint {
+  color: #666;
+  font-size: 0.92rem;
+  text-align: center;
+  opacity: 0.85;
+  margin-bottom: 2px;
+}
+
+@media (max-width: 700px) {
+  .sign-preview-container {
+    max-width: 98vw;
+    padding: 10px 2vw;
+  }
+  .sign-preview-canvas-wrap {
+    max-width: 98vw;
+    min-height: 160px;
+  }
+  .sign-preview-canvas {
+    max-width: 98vw;
+  }
+}
 :root {
   --accent: #667eea;
 }
