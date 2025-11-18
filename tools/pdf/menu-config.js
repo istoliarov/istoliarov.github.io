@@ -19,6 +19,19 @@ const PDF_TOOLBOX_ABILITIES = [
   { title: 'Rotate PDF', desc: 'Rotate PDF pages', tags: ['utility', 'editing'], url: 'pdf-rotate', icon: '🔄' }
 ];
 
+/* Navbar configuration: an ordered list of items to show in the navbar.
+   Each item may be:
+     - { title: 'Text', href: 'path' }           => renders a normal link
+     - { title: 'Tools', dropdown: true }         => renders the Tools dropdown placeholder
+   The `href` is resolved relative to the current navbar homeHref.
+*/
+const PDF_TOOLBOX_NAV = [
+  { title: 'Merge PDF', href: 'pdf-merge/' },
+  { title: 'Split PDF', href: 'pdf-split/' },
+  { title: 'Compress PDF', href: 'pdf-compress/' },
+  { title: 'Tools', dropdown: true }
+];
+
 function populateToolsDropdown(basePath = '') {
   const dropdown = document.getElementById('toolsDropdown');
   if (!dropdown) return;
