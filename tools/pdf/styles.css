@@ -367,6 +367,50 @@ p.lead {
   border-color: #5568d3;
 }
 
+/* Dropzone (used across many PDF tools) */
+.dropzone {
+  border: 2px dashed var(--accent);
+  border-radius: 8px;
+  padding: 28px 18px;
+  text-align: center;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.18s ease-in-out;
+  background: #fbfcff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+.dropzone .dropzone-icon {
+  font-size: 34px;
+  line-height: 1;
+}
+.dropzone .dropzone-text {
+  color: #666;
+  font-size: 0.95rem;
+}
+.dropzone .file-input-label {
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+  padding: 6px 10px;
+  background: var(--accent);
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+.dropzone .file-input-label:hover{ background: #5568d3; }
+.dropzone.dragover {
+  background: #eef3ff;
+  border-color: #5568d3;
+  transform: translateY(-2px);
+}
+.dropzone input[type="file"] { display: none; }
+
 .upload-area.dragover {
   background: #eef3ff;
   border-color: #5568d3;
