@@ -9,53 +9,7 @@
   <link rel="canonical" href="/tools/pdf/pdf-sign/">
   <meta name="robots" content="index,follow">
   <link rel="stylesheet" href="../styles.css">
-  <style>
-    /* Tool-specific overrides (do not override .card) */
-    .signature-input-group{margin-top:16px;border-top:1px solid #eee;padding-top:16px}
-    .signature-input-group label{margin-bottom:8px}
-    .signature-text-input{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:.95rem;font-family:Arial,sans-serif}
-    .signature-text-input:focus{outline:none;border-color:var(--accent)}
-    .signature-canvas{border:1px solid #ddd;border-radius:6px;cursor:crosshair;background:#fff;width:100%;height:150px;margin-top:8px}
-    .signature-controls{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-    .signature-controls button{font-size:.9rem;padding:8px 12px}
-    .signature-mode-selector{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-    .signature-mode-selector label{margin:0;display:flex;align-items:center;gap:6px;font-weight:400}
-    .signature-mode-selector input[type=radio]{margin:0}
-    h1{margin:0 0 8px;font-size:1.4rem}
-    .hint-header{color:var(--muted);font-size:.9rem;margin-bottom:20px}
-    .card{background:var(--card);border-radius:8px;padding:20px;box-shadow:0 6px 18px rgba(20,20,40,.06);margin-bottom:20px}
-    label{display:block;font-size:.95rem;margin-bottom:8px;font-weight:500}
-    .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px}
-    button{background:var(--accent);color:#fff;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font-size:.95rem;transition:all 0.2s}
-    button:hover{opacity:0.9;transform:translateY(-1px)}
-    button:disabled{opacity:0.5;cursor:not-allowed;transform:none}
-    button.secondary{background:#6c757d}
-    input[type=file]{display:none}
-    .file-input-label{display:inline-block;padding:8px 16px;background:var(--accent);color:#fff;border-radius:6px;cursor:pointer;font-size:.9rem;transition:all 0.2s}
-    .file-input-label:hover{opacity:0.9}
-    .file-info{color:var(--muted);font-size:.85rem;margin-top:8px;display:flex;gap:16px;flex-wrap:wrap}
-    .file-info span{display:flex;align-items:center;gap:4px}
-    .signature-input-group{margin-top:16px;border-top:1px solid #eee;padding-top:16px}
-    .signature-input-group label{margin-bottom:8px}
-    .signature-text-input{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:.95rem;font-family:Arial,sans-serif}
-    .signature-text-input:focus{outline:none;border-color:var(--accent)}
-    .signature-canvas{border:1px solid #ddd;border-radius:6px;cursor:crosshair;background:#fff;width:100%;height:150px;margin-top:8px}
-    .signature-controls{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-    .signature-controls button{font-size:.9rem;padding:8px 12px}
-    .signature-mode-selector{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-    .signature-mode-selector label{margin:0;display:flex;align-items:center;gap:6px;font-weight:400}
-    .signature-mode-selector input[type=radio]{margin:0}
-    .position-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-    .progress{width:100%;background:#f0f0f0;border-radius:6px;height:12px;overflow:hidden;margin-top:12px}
-    .progress > i{display:block;height:100%;background:var(--accent);width:0%;transition:width 0.3s}
-    .hint{font-size:.85rem;color:var(--muted);margin-top:8px}
-    .error{color:var(--error);font-size:.85rem;margin-top:8px}
-    .success{color:var(--success);font-size:.85rem;margin-top:8px}
-    input[type=number]{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:.9rem}
-    input[type=number]:focus{outline:none;border-color:var(--accent)}
-    select{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:.9rem;background:#fff}
-    select:focus{outline:none;border-color:var(--accent)}
-  </style>
+  <!-- Tool-specific styles moved into ../styles.css for consistency with the site's design system -->
   <meta property="og:title" content="PDF Toolbox — Sign PDF">
   <meta property="og:description" content="Add digital signature to PDF files directly in your browser. Support for drag and drop.">
   <meta property="og:type" content="website">
@@ -763,4 +717,4 @@
   <div id="footer-container"></div>
   <script src="../footer.js"></script>
 </body>
-</html>
+  <!-- Tool-specific inline styles removed — styles moved to `styles.css` for unified UI -->

@@ -59,6 +59,30 @@
   margin-bottom: 2px;
 }
 
+/* Signature tool specific styles (moved from inline in pdf-sign) */
+.signature-input-group{margin-top:16px;border-top:1px solid rgba(0,0,0,0.06);padding-top:16px}
+.signature-input-group label{margin-bottom:8px;display:block}
+.signature-text-input{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:.95rem;font-family:Arial,sans-serif}
+.signature-text-input:focus{outline:none;border-color:var(--accent)}
+.signature-canvas{border:1px solid #ddd;border-radius:6px;cursor:crosshair;background:#fff;width:100%;height:150px;margin-top:8px}
+.signature-controls{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.signature-controls button{font-size:.9rem;padding:8px 12px}
+.signature-mode-selector{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.signature-mode-selector label{margin:0;display:flex;align-items:center;gap:6px;font-weight:400}
+.signature-mode-selector input[type=radio]{margin:0}
+
+/* Positioning controls for signature placement */
+.position-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+
+/* Inline-style helpers moved from pdf-sign/index.html */
+.progress{width:100%;background:#f0f0f0;border-radius:6px;height:12px;overflow:hidden;margin-top:12px}
+.progress > i{display:block;height:100%;background:var(--accent);width:0%;transition:width 0.3s}
+.hint{font-size:.85rem;color:#666;margin-top:8px}
+.error{color:var(--error, #e74c3c);font-size:.85rem;margin-top:8px}
+.success{color:var(--success, #2e7d32);font-size:.85rem;margin-top:8px}
+.file-info{color:#666;font-size:.85rem;margin-top:8px;display:flex;gap:16px;flex-wrap:wrap}
+.file-info span{display:flex;align-items:center;gap:4px}
+
 @media (max-width: 700px) {
   .sign-preview-container {
     max-width: 98vw;
@@ -74,6 +98,14 @@
 }
 :root {
   --accent: #667eea;
+  --glass-bg: rgba(255,255,255,0.6);
+  --glass-border: rgba(255,255,255,0.6);
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --muted: #666666;
+  --error: #e74c3c;
+  --success: #27ae60;
 }
 
 body {
@@ -491,6 +523,38 @@ p.lead {
 }
 
 /* Buttons */
+/* Add default button element styles for backward compatibility with pages using plain <button> */
+button, input[type="button"], input[type="submit"] {
+  padding: 10px 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+  background: #5568d3;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.18);
+}
+
+button:active, input[type="button"]:active, input[type="submit"]:active {
+  transform: translateY(1px);
+}
+
+button.secondary, .btn.secondary, .secondary {
+  background: #6c757d;
+  color: #fff;
+}
+
+button.small, .small {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
 .btn {
   padding: 10px 20px;
   background: var(--accent);
@@ -601,11 +665,14 @@ canvas {
 
 /* Card & content styles */
 .card {
-  background: #fff;
-  border-radius: 8px;
+  background: var(--glass-bg);
+  border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 6px 18px rgba(20, 20, 40, 0.06);
+  box-shadow: var(--glass-shadow);
   margin-bottom: 20px;
+  border: 1px solid rgba(255,255,255,0.35);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
 }
 
 .card h2 {
