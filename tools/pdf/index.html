@@ -64,6 +64,7 @@
     const grid = document.getElementById('abilitiesGrid');
     grid.innerHTML = abilities.map((a, i) => `
       <a href="${a.url}/" class="ability-card" data-tags="${a.tags.join(' ')}" data-index="${i}">
+        <div class="ability-card-icon">${a.icon || '📄'}</div>
         <div class="ability-card-title">${a.title}</div>
         <div class="ability-card-desc">${a.desc}</div>
       </a>

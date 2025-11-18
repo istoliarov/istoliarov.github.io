@@ -318,6 +318,19 @@ p.lead {
   margin-bottom: 6px;
 }
 
+.ability-card-icon {
+  font-size: 2rem;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(102,126,234,0.08);
+}
+
 .ability-card-desc {
   font-size: 0.8rem;
   color: #666;
