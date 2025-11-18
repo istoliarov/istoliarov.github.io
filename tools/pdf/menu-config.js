@@ -11,6 +11,10 @@ const PDF_TOOLBOX_ABILITIES = [
   { title: 'PDF → PPTX', desc: 'Convert PDF to slides', tags: ['extraction', 'presentation'], url: 'pdf-to-pptx' },
   { title: 'PDF → Excel', desc: 'Convert PDF to spreadsheet', tags: ['extraction', 'spreadsheet'], url: 'pdf-to-excel' },
   { title: 'Sign PDF', desc: 'Add digital signature', tags: ['utility', 'security'], url: 'pdf-sign' },
+  { title: 'Compress PDF', desc: 'Reduce PDF file size', tags: ['utility', 'optimize'], url: 'pdf-compress' },
+  { title: 'Add Password', desc: 'Protect PDF with password (info)', tags: ['utility', 'security'], url: 'pdf-password' },
+  { title: 'Sanitize PDF', desc: 'Remove metadata and personal info', tags: ['utility', 'privacy'], url: 'pdf-sanitize' },
+  { title: 'Merge PDF', desc: 'Merge multiple PDFs into one', tags: ['utility', 'merge'], url: 'pdf-merge' },
   { title: 'Watermark', desc: 'Add watermark to PDF', tags: ['utility', 'security'], url: 'pdf-watermark' },
   { title: 'Rotate PDF', desc: 'Rotate PDF pages', tags: ['utility', 'editing'], url: 'pdf-rotate' }
 ];

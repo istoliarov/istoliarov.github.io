@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PDF Toolbox — Merge PDF</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../menu-config.js"></script>
+  <script src="../navbar.js"></script>
+  <script src="../dist/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="../dist/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="wrap">
+    <h1>Merge PDF</h1>
+    <div class="hint-header">Merge multiple PDF files into a single PDF (client-side)</div>
+
+    <div class="card">
+      <label>Upload PDF Files (multiple)</label>
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-icon">📄➕</div>
+        <div>Drop multiple PDF files here or <label for="fileInput" class="file-input-label">Browse Files</label></div>
+        <input id="fileInput" type="file" accept="application/pdf" multiple>
+      </div>
+
+      <div id="filesList" style="margin-top:12px"></div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <button id="mergeBtn" disabled>Merge PDFs</button>
+        <button id="clearBtn" class="secondary" style="display:none">Clear</button>
+      </div>
+      <div id="output" class="hint" style="margin-top:12px"></div>
+      <div id="progress" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '../dist/pdf.js/2.16.105/pdf.worker.min.js';
+    const { jsPDF } = window.jspdf;
+
+    const fileInput = document.getElementById('fileInput');
+    const dropzone = document.getElementById('dropzone');
+    const filesList = document.getElementById('filesList');
+    const mergeBtn = document.getElementById('mergeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const output = document.getElementById('output');
+    const progress = document.getElementById('progress');
+
+    let files = [];
+
+    function setProgress(pct, text){ progress.innerHTML = `<div class="progress"><i style="width:${pct}%"></i></div>` + (text?`<div class="hint">${text}</div>`:''); }
+    function clearProgress(){ progress.innerHTML=''; }
+
+    function renderFiles(){
+      filesList.innerHTML = files.map((f,i)=>`<div>${i+1}. ${f.name} (${Math.round(f.size/1024)} KB)</div>`).join('');
+      mergeBtn.disabled = files.length < 2;
+      clearBtn.style.display = files.length? 'inline-block':'none';
+    }
+
+    ['dragenter','dragover','dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();}));
+    ['dragenter','dragover'].forEach(ev=>dropzone.addEventListener(ev,()=>dropzone.classList.add('dragover')));
+    ['dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,()=>dropzone.classList.remove('dragover')));
+    dropzone.addEventListener('drop', (e)=>{ if(e.dataTransfer.files.length){ files = Array.from(e.dataTransfer.files); renderFiles(); }});
+    dropzone.addEventListener('click', ()=>fileInput.click());
+    fileInput.addEventListener('change',(e)=>{ if(e.target.files.length){ files = Array.from(e.target.files); renderFiles(); fileInput.value=''; }});
+
+    mergeBtn.addEventListener('click', async ()=>{
+      if(files.length < 2) return;
+      setProgress(5,'Preparing merge...');
+      try{
+        const outPdf = new jsPDF({ unit:'mm', format:'a4' });
+        let pageCounter = 0;
+        for(let i=0;i<files.length;i++){
+          const file = files[i];
+          const arrayBuf = await file.arrayBuffer();
+          const srcDoc = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+          for(let p=1;p<=srcDoc.numPages;p++){
+            pageCounter++; setProgress(Math.round((pageCounter/(srcDoc.numPages*files.length))*80), `Processing ${file.name}: page ${p}`);
+            const page = await srcDoc.getPage(p);
+            const viewport = page.getViewport({ scale:1.5 });
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width; canvas.height = viewport.height;
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+            const imgData = canvas.toDataURL('image/png');
+            if(!(pageCounter===1)) outPdf.addPage();
+            const w = outPdf.internal.pageSize.getWidth(); const h = outPdf.internal.pageSize.getHeight();
+            outPdf.addImage(imgData, 'PNG', 0, 0, w, h);
+          }
+        }
+        setProgress(90,'Finalizing...');
+        const blob = outPdf.output('blob');
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'merged-'+Date.now()+'.pdf';
+        a.click();
+        output.innerHTML = `<div class="success">✓ Merged. <a href="#" id="dl">Download</a></div>`;
+        document.getElementById('dl').onclick = (e)=>{e.preventDefault(); a.click();};
+        clearProgress();
+      }catch(err){ output.innerHTML = `<div class="error">Error merging: ${err.message}</div>`; clearProgress(); }
+    });
+
+    clearBtn.addEventListener('click', ()=>{ files = []; renderFiles(); output.innerHTML=''; clearProgress(); });
+  })();
+  </script>
+
+  <div id="footer-container"></div>
+  <script src="../footer.js"></script>
+</body>
+</html>

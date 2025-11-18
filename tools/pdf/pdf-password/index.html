@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PDF Toolbox — Add Password</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../menu-config.js"></script>
+  <script src="../navbar.js"></script>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="wrap">
+    <h1>Add Password</h1>
+    <div class="hint-header">Client-side PDF password protection is limited — see notes below</div>
+
+    <div class="card">
+      <label>Upload PDF File</label>
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-icon">🔒</div>
+        <div>Drop PDF file here or <label for="fileInput" class="file-input-label">Browse Files</label></div>
+        <input id="fileInput" type="file" accept="application/pdf">
+      </div>
+
+      <div id="fileInfo" class="file-info" style="display:none"></div>
+
+      <div class="control-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Enter password" />
+      </div>
+      <div class="hint">Note: Strong PDF password encryption (standard owner/user encryption) is not reliably available purely client-side in all browsers. This tool provides a UI and guidance. If you need true PDF encryption, use a server-side tool or a native app.</div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <button id="protectBtn" disabled>Add Password (wrap)</button>
+        <button id="clearBtn" class="secondary" style="display:none">Clear</button>
+      </div>
+
+      <div id="output" class="hint" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const fileInput = document.getElementById('fileInput');
+    const dropzone = document.getElementById('dropzone');
+    const fileInfo = document.getElementById('fileInfo');
+    const protectBtn = document.getElementById('protectBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const passwordInput = document.getElementById('password');
+    const output = document.getElementById('output');
+
+    let fileData = null;
+
+    ['dragenter','dragover','dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();}));
+    ['dragenter','dragover'].forEach(ev=>dropzone.addEventListener(ev,()=>dropzone.classList.add('dragover')));
+    ['dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,()=>dropzone.classList.remove('dragover')));
+    dropzone.addEventListener('drop', (e)=>{ if(e.dataTransfer.files.length) loadPdfFile(e.dataTransfer.files[0]); });
+    dropzone.addEventListener('click', ()=>fileInput.click());
+    fileInput.addEventListener('change', (e)=>{ if(e.target.files.length) loadPdfFile(e.target.files[0]); fileInput.value=''; });
+
+    function loadPdfFile(file){ fileData = file; fileInfo.innerHTML = `📄 ${file.name} — ${Math.round(file.size/1024)} KB`; fileInfo.style.display='flex'; protectBtn.disabled=false; clearBtn.style.display='inline-block'; output.innerHTML=''; }
+
+    protectBtn.addEventListener('click', ()=>{
+      if(!fileData){ output.innerHTML = `<div class="error">No file</div>`; return; }
+      const pwd = passwordInput.value || '';
+      if(!pwd){ output.innerHTML = `<div class="error">Enter a password</div>`; return; }
+      // For now we provide guidance and a fallback: download original and show instructions
+      output.innerHTML = `<div class="info">Client-side PDF encryption is limited. For secure password protection use a dedicated tool. Your file is ready to download; you can protect it with a desktop tool.</div>
+        <div style="margin-top:8px"><a id="dl" href="#">Download original PDF</a></div>`;
+      const a = document.createElement('a'); a.href = URL.createObjectURL(fileData); a.download = fileData.name; document.getElementById('dl').onclick = (e)=>{ e.preventDefault(); a.click(); };
+    });
+
+    clearBtn.addEventListener('click', ()=>{ fileData = null; fileInfo.style.display='none'; protectBtn.disabled=true; clearBtn.style.display='none'; output.innerHTML=''; passwordInput.value=''; });
+  })();
+  </script>
+
+  <div id="footer-container"></div>
+  <script src="../footer.js"></script>
+</body>
+</html>

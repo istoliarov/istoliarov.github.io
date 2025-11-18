@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PDF Toolbox — Sanitize PDF</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script src="../menu-config.js"></script>
+  <script src="../navbar.js"></script>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="wrap">
+    <h1>Sanitize PDF</h1>
+    <div class="hint-header">Remove metadata and personal information from PDF (client-side)</div>
+
+    <div class="card">
+      <label>Upload PDF File</label>
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-icon">🧹</div>
+        <div>Drop PDF file here or <label for="fileInput" class="file-input-label">Browse Files</label></div>
+        <input id="fileInput" type="file" accept="application/pdf">
+      </div>
+
+      <div id="fileInfo" class="file-info" style="display:none"></div>
+
+      <div class="control-group">
+        <label><input type="checkbox" id="clearMeta" checked> Clear metadata (title, author, subject, keywords)</label>
+      </div>
+      <div class="control-group">
+        <label><input type="checkbox" id="flattenForms"> Flatten form fields (if any)</label>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="sanitizeBtn" disabled>Sanitize PDF</button>
+        <button id="clearBtn" class="secondary" style="display:none">Clear</button>
+      </div>
+
+      <div id="output" class="hint" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const { PDFDocument } = window.PDFLib;
+    const fileInput = document.getElementById('fileInput');
+    const dropzone = document.getElementById('dropzone');
+    const fileInfo = document.getElementById('fileInfo');
+    const sanitizeBtn = document.getElementById('sanitizeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const output = document.getElementById('output');
+
+    let fileData = null;
+
+    ['dragenter','dragover','dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();}));
+    ['dragenter','dragover'].forEach(ev=>dropzone.addEventListener(ev,()=>dropzone.classList.add('dragover')));
+    ['dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,()=>dropzone.classList.remove('dragover')));
+    dropzone.addEventListener('drop', (e)=>{ if(e.dataTransfer.files.length) loadPdfFile(e.dataTransfer.files[0]); });
+    dropzone.addEventListener('click', ()=>fileInput.click());
+    fileInput.addEventListener('change', (e)=>{ if(e.target.files.length) loadPdfFile(e.target.files[0]); fileInput.value=''; });
+
+    async function loadPdfFile(file){
+      fileData = file;
+      fileInfo.innerHTML = `📄 ${file.name} — ${Math.round(file.size/1024)} KB`;
+      fileInfo.style.display = 'flex';
+      sanitizeBtn.disabled = false; clearBtn.style.display='inline-block'; output.innerHTML='';
+    }
+
+    sanitizeBtn.addEventListener('click', async ()=>{
+      if(!fileData) return;
+      output.innerHTML = '';
+      try{
+        const arrayBuf = await fileData.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(arrayBuf);
+        if(document.getElementById('clearMeta').checked){
+          pdfDoc.setTitle(''); pdfDoc.setAuthor(''); pdfDoc.setSubject(''); pdfDoc.setKeywords([]); pdfDoc.setProducer(''); pdfDoc.setCreator('');
+        }
+        if(document.getElementById('flattenForms').checked){
+          try{ const form = pdfDoc.getForm(); form.flatten(); }catch(e){ /* ignore if no forms */ }
+        }
+        const bytes = await pdfDoc.save();
+        const blob = new Blob([bytes], { type:'application/pdf' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (fileData.name||'document').replace(/\.pdf$/i,'')+'-sanitized.pdf'; a.click();
+        output.innerHTML = '<div class="success">✓ Sanitized PDF ready for download</div>';
+      }catch(err){ output.innerHTML = `<div class="error">Error sanitizing: ${err.message}</div>`; }
+    });
+
+    clearBtn.addEventListener('click', ()=>{ fileData = null; fileInfo.style.display='none'; sanitizeBtn.disabled=true; clearBtn.style.display='none'; output.innerHTML=''; });
+  })();
+  </script>
+
+  <div id="footer-container"></div>
+  <script src="../footer.js"></script>
+</body>
+</html>

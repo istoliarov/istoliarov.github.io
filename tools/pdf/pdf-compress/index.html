@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PDF Toolbox — Compress PDF</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../menu-config.js"></script>
+  <script src="../navbar.js"></script>
+  <script src="../dist/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="../dist/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="wrap">
+    <h1>Compress PDF</h1>
+    <div class="hint-header">Choose compression level and compress PDF pages (client-side)</div>
+
+    <div class="card">
+      <label>Upload PDF File</label>
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-icon">📄</div>
+        <div>Drop PDF file here or <label for="fileInput" class="file-input-label">Browse Files</label></div>
+        <input id="fileInput" type="file" accept="application/pdf">
+      </div>
+
+      <div id="fileInfo" class="file-info" style="display:none"></div>
+
+      <div class="control-group">
+        <label for="level">Compression Level</label>
+        <select id="level">
+          <option value="low">Low (best quality)</option>
+          <option value="mid" selected>Medium</option>
+          <option value="high">High</option>
+          <option value="max">Max (smallest)</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="compressBtn" disabled>Compress PDF</button>
+        <button id="clearBtn" class="secondary" style="display:none">Clear</button>
+      </div>
+
+      <div id="output" class="hint" style="margin-top:12px"></div>
+      <div id="progress" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '../dist/pdf.js/2.16.105/pdf.worker.min.js';
+    const { jsPDF } = window.jspdf;
+
+    let pdfDoc = null;
+    let fileData = null;
+    const fileInput = document.getElementById('fileInput');
+    const dropzone = document.getElementById('dropzone');
+    const fileInfo = document.getElementById('fileInfo');
+    const compressBtn = document.getElementById('compressBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const output = document.getElementById('output');
+    const progress = document.getElementById('progress');
+
+    function setProgress(pct, text){
+      progress.innerHTML = `<div class="progress"><i style="width:${pct}%"></i></div>` + (text?`<div class="hint">${text}</div>`:'');
+    }
+    function clearProgress(){ progress.innerHTML = ''; }
+
+    async function loadPdfFile(file){
+      fileData = file;
+      try{
+        const arrayBuf = await file.arrayBuffer();
+        pdfDoc = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+        fileInfo.innerHTML = `📄 ${file.name} — ${pdfDoc.numPages} page${pdfDoc.numPages>1?'s':''}`;
+        fileInfo.style.display = 'flex';
+        compressBtn.disabled = false;
+        clearBtn.style.display = 'inline-block';
+        output.innerHTML = '';
+      }catch(err){ output.innerHTML = `<div class="error">Error loading PDF: ${err.message}</div>` }
+    }
+
+    ['dragenter','dragover','dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();}));
+    ['dragenter','dragover'].forEach(ev=>dropzone.addEventListener(ev,()=>dropzone.classList.add('dragover')));
+    ['dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,()=>dropzone.classList.remove('dragover')));
+    dropzone.addEventListener('drop', (e)=>{ if(e.dataTransfer.files.length) loadPdfFile(e.dataTransfer.files[0]); });
+    dropzone.addEventListener('click', ()=>fileInput.click());
+    fileInput.addEventListener('change', (e)=>{ if(e.target.files.length) loadPdfFile(e.target.files[0]); fileInput.value=''; });
+
+    compressBtn.addEventListener('click', async ()=>{
+      if(!pdfDoc){ output.innerHTML = `<div class="error">No PDF loaded</div>`; return; }
+      const level = document.getElementById('level').value;
+      const qualityMap = { low:0.9, mid:0.7, high:0.5, max:0.25 };
+      const quality = qualityMap[level] || 0.7;
+      setProgress(5,'Preparing...');
+      try{
+        const pdfOut = new jsPDF({ unit:'mm', format:'a4' });
+        for(let p=1;p<=pdfDoc.numPages;p++){
+          setProgress(Math.round((p/pdfDoc.numPages)*80), `Processing page ${p}...`);
+          const page = await pdfDoc.getPage(p);
+          const viewport = page.getViewport({ scale:1.5 });
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          const imgData = canvas.toDataURL('image/jpeg', quality);
+          if(p>1) pdfOut.addPage();
+          const w = pdfOut.internal.pageSize.getWidth();
+          const h = pdfOut.internal.pageSize.getHeight();
+          pdfOut.addImage(imgData, 'JPEG', 0, 0, w, h);
+        }
+        setProgress(90,'Finalizing...');
+        const blob = pdfOut.output('blob');
+        const a = document.createElement('a');
+        const filename = (fileData && fileData.name?fileData.name.replace(/\.pdf$/i,''):'document') + `-compressed-${level}.pdf`;
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        output.innerHTML = `<div class="success">✓ Compressed. <a href="#" id="dl">Download</a></div>`;
+        document.getElementById('dl').onclick = (e)=>{ e.preventDefault(); a.click(); };
+        clearProgress();
+      }catch(err){ output.innerHTML = `<div class="error">Error compressing: ${err.message}</div>`; clearProgress(); }
+    });
+
+    clearBtn.addEventListener('click', ()=>{
+      pdfDoc = null; fileData = null; fileInfo.style.display='none'; compressBtn.disabled=true; clearBtn.style.display='none'; output.innerHTML=''; clearProgress();
+    });
+  })();
+  </script>
+
+  <div id="footer-container"></div>
+  <script src="../footer.js"></script>
+</body>
+</html>
