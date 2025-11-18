@@ -247,7 +247,13 @@
         pageRotations[pageNum] = 0;
       }
       pageRotations[pageNum] = (pageRotations[pageNum] + angle) % 360;
-      renderPages();
+      // Update only the affected page preview and label
+      if (window.pageItemRefs && window.pageItemRefs[pageNum]) {
+        const { pageNumDiv } = window.pageItemRefs[pageNum];
+        const rotation = getPageRotation(pageNum);
+        pageNumDiv.textContent = `Page ${pageNum}${rotation !== 0 ? ` (${rotation}°)` : ''}`;
+        updatePagePreview(pageNum);
+      }
     }
 
     function getPageRotation(pageNum) {
@@ -267,36 +273,124 @@
       if (!pdfDoc) return;
 
       pagesContainer.innerHTML = '';
-      for (let p = 1; p <= pdfDoc.numPages; p++) {
+      // Loading bar for previews
+      const previewProgress = document.createElement('div');
+      previewProgress.className = 'progress';
+      previewProgress.innerHTML = '<i style="width:0%"></i>';
+      pagesContainer.appendChild(previewProgress);
+
+      let loadedCount = 0;
+      const totalPages = pdfDoc.numPages;
+
+      // Helper to update loading bar
+      function updatePreviewProgress() {
+        const pct = Math.round((loadedCount / totalPages) * 100);
+        previewProgress.querySelector('i').style.width = pct + '%';
+        if (loadedCount === totalPages) {
+          setTimeout(() => previewProgress.remove(), 500);
+        }
+      }
+
+      // Store page items for efficient updates
+      const pageItemRefs = {};
+
+      // Render all page items
+      for (let p = 1; p <= totalPages; p++) {
         const isSelected = selectedPages.has(p);
         const rotation = getPageRotation(p);
-        
+
         const pageItem = document.createElement('div');
         pageItem.className = `page-item ${isSelected ? 'selected' : ''}`;
-        pageItem.innerHTML = `
-          <div class="page-item-number">Page ${p}${rotation !== 0 ? ` (${rotation}°)` : ''}</div>
-          <div class="page-item-controls">
-            <button type="button" class="small" onclick="rotatePage90CW(${p})">↻ 90°</button>
-            <button type="button" class="small secondary" onclick="rotatePage90CCW(${p})">↺ 90°</button>
-          </div>
+        pageItem.dataset.pageNum = p;
+
+        // Page number and controls
+        const pageNumDiv = document.createElement('div');
+        pageNumDiv.className = 'page-item-number';
+        pageNumDiv.textContent = `Page ${p}${rotation !== 0 ? ` (${rotation}°)` : ''}`;
+        pageItem.appendChild(pageNumDiv);
+
+        // Thumbnail preview
+        const thumbDiv = document.createElement('div');
+        thumbDiv.className = 'page-thumb';
+        thumbDiv.innerHTML = '<div class="preview-loading">Loading...</div>';
+        pageItem.appendChild(thumbDiv);
+
+        // Controls
+        const controlsDiv = document.createElement('div');
+        controlsDiv.className = 'page-item-controls';
+        controlsDiv.innerHTML = `
+          <button type="button" class="small" onclick="rotatePage90CW(${p})">↻ 90°</button>
+          <button type="button" class="small secondary" onclick="rotatePage90CCW(${p})">↺ 90°</button>
         `;
+        pageItem.appendChild(controlsDiv);
+
         pageItem.addEventListener('click', (e) => {
           if (!e.target.tagName.includes('BUTTON')) {
             togglePageSelection(p);
           }
         });
         pagesContainer.appendChild(pageItem);
+        pageItemRefs[p] = { pageItem, thumbDiv, pageNumDiv };
       }
+
+      // Render thumbnails (optimized, compressed)
+      async function renderPagePreview(pageNum) {
+        const { thumbDiv } = pageItemRefs[pageNum];
+        thumbDiv.innerHTML = '<div class="preview-loading">Loading...</div>';
+        try {
+          const page = await pdfDoc.getPage(pageNum);
+          const scale = 0.13;
+          const rotation = getPageRotation(pageNum);
+          const viewport = page.getViewport({ scale, rotation });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          canvas.style.width = '80px';
+          canvas.style.height = 'auto';
+          canvas.setAttribute('aria-label', `Preview of page ${pageNum}`);
+          const ctx = canvas.getContext('2d', { alpha: false });
+          await page.render({ canvasContext: ctx, viewport, renderInteractiveForms: false }).promise;
+          // Compress preview by converting to JPEG (if image-heavy)
+          let imgData;
+          try {
+            imgData = canvas.toDataURL('image/jpeg', 0.6);
+          } catch {
+            imgData = canvas.toDataURL('image/png');
+          }
+          const img = document.createElement('img');
+          img.src = imgData;
+          img.alt = `Preview of page ${pageNum}`;
+          img.style.width = '80px';
+          img.style.height = 'auto';
+          thumbDiv.innerHTML = '';
+          thumbDiv.appendChild(img);
+        } catch (err) {
+          thumbDiv.textContent = 'Preview error';
+        }
+        loadedCount++;
+        updatePreviewProgress();
+      }
+
+      // Initial render for all pages
+      for (let p = 1; p <= totalPages; p++) {
+        renderPagePreview(p);
+      }
+
+      // Expose for efficient update on rotation
+      window.updatePagePreview = renderPagePreview;
+      window.pageItemRefs = pageItemRefs;
 
       rotateBtn.disabled = selectedPages.size === 0;
     }
 
     window.rotatePage90CW = function(pageNum) {
       rotatePage(pageNum, 90);
+      updatePagePreview(pageNum);
     };
 
     window.rotatePage90CCW = function(pageNum) {
       rotatePage(pageNum, 270);
+      updatePagePreview(pageNum);
     };
 
     // Load PDF file
