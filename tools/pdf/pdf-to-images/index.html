@@ -83,8 +83,7 @@
   }
   </script>
   <script src="../menu-config.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script src="../menu-config.js"></script>
+  <script src="../dist/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="../navbar.js"></script>
 </head>
 <body>
@@ -133,7 +132,7 @@
   <script>
   (function(){
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '../dist/pdf.js/2.16.105/pdf.worker.min.js';
     const JSZip = window.JSZip;
     let pdfDoc = null;
     let fileData = null;

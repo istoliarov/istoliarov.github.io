@@ -87,8 +87,8 @@
   </script>
   <script src="../menu-config.js"></script>
   <script src="../navbar.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="../dist/pdf.js/2.16.105/pdf.worker.min.js"></script>
+  <script src="../dist/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <div id="navbar-container"></div>
@@ -169,7 +169,7 @@
   (function() {
     const { jsPDF } = window.jspdf;
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '../dist/pdf.js/2.16.105/pdf.worker.min.js';
 
     let pdfDoc = null;
     let fileData = null;
