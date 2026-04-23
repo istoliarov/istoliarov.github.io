@@ -26,67 +26,20 @@
   }
   </script>
   <script src="menu-config.js"></script>
-  <script src="navbar.js"></script>
+  <script src="./dist/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="./dist/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="./dist/mammoth/1.11.4/mammoth.browser.min.js"></script>
+  <script src="./dist/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="./dist/pptxgenjs/3.12.0/pptxgen.min.js"></script>
+  <script src="./dist/jszip/3.10.1/jszip.min.js"></script>
+  <script src="./dist/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 </head>
 <body>
-  <div id="navbar-container"></div>
-
-  <div class="wrap">
-    <h1>PDF Toolbox</h1>
-    <p class="lead">Simple client-side utilities to convert images, text and Word documents to PDF and to extract images/text back from PDFs. Also sign, watermark, and rotate PDFs. Files never leave your browser.</p>
-
-    <div class="tags-container" id="tagsContainer"></div>
-
-    <div class="grid" id="abilitiesGrid"></div>
-  </div>
-
-  <script>
-  const abilities = PDF_TOOLBOX_ABILITIES;
-
-  const allTags = [...new Set(abilities.flatMap(a => a.tags))];
-  let activeTag = null;
-
-  function renderTags() {
-    const container = document.getElementById('tagsContainer');
-    container.innerHTML = '<button class="tag-btn active" data-tag="all">All</button>' +
-      allTags.map(tag => `<button class="tag-btn" data-tag="${tag}">${tag}</button>`).join('');
-    container.querySelectorAll('.tag-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeTag = btn.dataset.tag === 'all' ? null : btn.dataset.tag;
-        filterAbilities();
-      });
-    });
-  }
-
-  function renderAbilities() {
-    const grid = document.getElementById('abilitiesGrid');
-    grid.innerHTML = abilities.map((a, i) => `
-      <a href="${a.url}/" class="ability-card" data-tags="${a.tags.join(' ')}" data-index="${i}">
-        <div class="ability-card-icon">${a.icon || '📄'}</div>
-        <div class="ability-card-title">${a.title}</div>
-        <div class="ability-card-desc">${a.desc}</div>
-      </a>
-    `).join('');
-  }
-
-  function filterAbilities() {
-    const cards = document.querySelectorAll('.ability-card');
-    cards.forEach(card => {
-      if (!activeTag) {
-        card.classList.remove('hidden');
-      } else {
-        card.classList.toggle('hidden', !card.dataset.tags.includes(activeTag));
-      }
-    });
-  }
-
-  renderTags();
-  renderAbilities();
-  </script>
-
-  <div id="footer-container"></div>
-  <script src="footer.js"></script>
+  <div id="app"></div>
+  <script src="./app/tool-registry.js"></script>
+  <script src="./app/router.js"></script>
+  <script src="./app/tools.js"></script>
+  <script src="./app/shell.js"></script>
+  <script src="./app/boot.js"></script>
 </body>
 </html>

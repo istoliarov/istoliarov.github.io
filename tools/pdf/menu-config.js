@@ -1,5 +1,5 @@
 // Shared menu configuration for PDF Toolbox
-const PDF_TOOLBOX_ABILITIES = [
+const PDF_TOOLBOX_ABILITIES = window.PDF_TOOLBOX_ABILITIES = [
   { title: 'Images → PDF', desc: 'Convert images to PDF', tags: ['converter', 'image'], url: 'images-to-pdf', icon: '🖼️' },
   { title: 'TXT → PDF', desc: 'Convert text to PDF', tags: ['converter', 'text'], url: 'txt-to-pdf', icon: '📝' },
   { title: 'DOCX → PDF', desc: 'Convert Word to PDF', tags: ['converter', 'document'], url: 'docx-to-pdf', icon: '📄' },
@@ -25,14 +25,13 @@ const PDF_TOOLBOX_ABILITIES = [
      - { title: 'Tools', dropdown: true }         => renders the Tools dropdown placeholder
    The `href` is resolved relative to the current navbar homeHref.
 */
-const PDF_TOOLBOX_NAV = [
+const PDF_TOOLBOX_NAV = window.PDF_TOOLBOX_NAV = [
   { title: 'Merge PDF', href: 'pdf-merge/' },
-  { title: 'Split PDF', href: 'pdf-split/' },
   { title: 'Compress PDF', href: 'pdf-compress/' },
   { title: 'Tools', dropdown: true }
 ];
 
-function populateToolsDropdown(basePath = '') {
+window.populateToolsDropdown = function populateToolsDropdown(basePath = '') {
   const dropdown = document.getElementById('toolsDropdown');
   if (!dropdown) return;
   
@@ -40,5 +39,5 @@ function populateToolsDropdown(basePath = '') {
   dropdown.innerHTML = '<div class="tools-grid">' + 
     PDF_TOOLBOX_ABILITIES.map(a => `<a href="${pathPrefix}${a.url}/" class="tool-item">${a.title}</a>`).join('') +
     '</div>';
-}
+};
 
