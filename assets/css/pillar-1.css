@@ -5364,7 +5364,6 @@ button.close {
   border-top-color: rgba(0, 0, 0, 0.25);
 }
 
-
 .bs-popover-top .arrow::after,
 .bs-popover-auto[x-placement^="top"] .arrow::after {
   bottom: 1px;
@@ -5393,7 +5392,6 @@ button.close {
   border-right-color: rgba(0, 0, 0, 0.25);
 }
 
-
 .bs-popover-right .arrow::after,
 .bs-popover-auto[x-placement^="right"] .arrow::after {
   left: 1px;
@@ -5418,7 +5416,6 @@ button.close {
   top: 0;
   border-bottom-color: rgba(0, 0, 0, 0.25);
 }
-
 
 .bs-popover-bottom .arrow::after,
 .bs-popover-auto[x-placement^="bottom"] .arrow::after {
@@ -5458,7 +5455,6 @@ button.close {
   right: 0;
   border-left-color: rgba(0, 0, 0, 0.25);
 }
-
 
 .bs-popover-left .arrow::after,
 .bs-popover-auto[x-placement^="left"] .arrow::after {
@@ -8552,7 +8548,7 @@ a.theme-btn-on-bg:hover, a.theme-btn-on-bg:focus, a.theme-btn-on-bg:active, .the
 .resume-header {
   background: #434E5E;
   color: rgba(255, 255, 255, 0.9);
-  height: 220px;
+  min-height: 220px;
 }
 
 .resume-header .picture {
@@ -8579,6 +8575,19 @@ a.theme-btn-on-bg:hover, a.theme-btn-on-bg:focus, a.theme-btn-on-bg:active, .the
 
 .resume-social {
   font-size: 0.875rem;
+  margin-bottom: 0;
+}
+
+.resume-social br {
+  display: none;
+}
+
+.resume-social li {
+  margin-bottom: 0.75rem;
+}
+
+.resume-social li:last-child {
+  margin-bottom: 0;
 }
 
 .resume-social .fa-container {
@@ -8591,6 +8600,49 @@ a.theme-btn-on-bg:hover, a.theme-btn-on-bg:focus, a.theme-btn-on-bg:active, .the
   color: #434E5E;
 }
 
+.resume-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.resume-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 0.25rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+}
+
+.resume-action-btn:hover,
+.resume-action-btn:focus {
+  background: white;
+  color: #434E5E;
+  text-decoration: none;
+}
+
+button.resume-action-btn {
+  font-family: inherit;
+}
+
+.resume-header .resume-action-btn,
+.resume-header .resume-action-btn svg {
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.print-contact-links {
+  display: none;
+}
 .resume-section-title {
   font-size: 1.25rem;
   position: relative;
@@ -8639,6 +8691,68 @@ a.theme-btn-on-bg:hover, a.theme-btn-on-bg:focus, a.theme-btn-on-bg:active, .the
   border-radius: 50%;
 }
 
+.resume-timeline-details {
+  margin-top: 0.8rem;
+}
+
+.resume-timeline-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 34px;
+  padding: 0.32rem 0.7rem;
+  border: 1px solid #d9e0ea;
+  border-radius: 0.25rem;
+  background: #f7f8fa;
+  color: #434E5E;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+}
+
+.resume-timeline-summary::-webkit-details-marker {
+  display: none;
+}
+
+.resume-timeline-summary:before {
+  content: "+";
+  display: inline-grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #434E5E;
+  color: #fff;
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.resume-timeline-details[open] .resume-timeline-summary:before {
+  content: "-";
+}
+
+.resume-timeline-summary:hover,
+.resume-timeline-summary:focus {
+  border-color: #aab4c3;
+  background: #eef2f6;
+  outline: none;
+}
+
+.resume-timeline-details .resume-timeline-item-desc {
+  transition: height 260ms ease, opacity 200ms ease;
+  will-change: height, opacity;
+}
+
+.resume-timeline-details[open] .resume-timeline-item-desc {
+  margin-top: 0.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resume-timeline-details .resume-timeline-item-desc {
+    transition: none;
+  }
+}
 .resume-progress {
   height: 0.6rem;
 }
@@ -8719,5 +8833,238 @@ a.theme-btn-on-bg:hover, a.theme-btn-on-bg:focus, a.theme-btn-on-bg:active, .the
   .resume-header .picture {
     width: 120px;
     border-radius: 4px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .resume-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+  .resume-action-btn {
+    flex: 1 1 135px;
+  }
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 25mm 22mm 27mm;
+
+    @bottom-center {
+      content: counter(page) " / " counter(pages);
+      color: #8d9aad;
+      font-family: 'Roboto', sans-serif;
+      font-size: 8pt;
+    }
+  }
+
+  html,
+  body {
+    width: auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #232931 !important;
+    font-size: 10pt;
+    line-height: 1.35;
+  }
+
+  .resume-wrapper {
+    padding: 0 !important;
+  }
+
+  .resume-wrapper-inner {
+    max-width: none !important;
+    width: 100% !important;
+    box-shadow: none !important;
+  }
+
+  .resume-header {
+    height: auto !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #232931 !important;
+    border-bottom: 1.5pt solid #434E5E;
+  }
+
+  .resume-header .media-body {
+    padding: 0 0 8mm !important;
+  }
+
+  .resume-header .name {
+    color: #232931 !important;
+    font-size: 22pt;
+    letter-spacing: 0;
+  }
+
+  .resume-header a,
+  .resume-header a:hover {
+    color: #232931 !important;
+    text-decoration: none;
+  }
+
+  .resume-social .fa-container {
+    border: 1pt solid #8d9aad;
+    background: #fff !important;
+    color: #434E5E !important;
+  }
+
+  .resume-actions,
+  .footer {
+    display: none !important;
+  }
+
+  .resume-body {
+    padding: 8mm 0 0 !important;
+  }
+
+  .row {
+    display: block !important;
+    margin: 0 !important;
+  }
+
+  .col-lg-9,
+  .col-lg-3 {
+    display: block !important;
+    max-width: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .resume-section {
+    margin-bottom: 7mm !important;
+  }
+
+.print-contact-links {
+  display: none;
+}
+.resume-section-title {
+    font-size: 12pt;
+    color: #232931 !important;
+  }
+
+  .resume-section-title:after {
+    background: #8d9aad !important;
+  }
+
+  .resume-section-content,
+  .resume-company-name,
+  .resume-position-title,
+  .resume-degree,
+  .resume-award-name,
+  .resume-lang-name {
+    color: #232931 !important;
+  }
+
+  .resume-timeline {
+    padding-left: 0 !important;
+  }
+
+  .resume-timeline:before,
+  .resume-timeline-item:before {
+    display: none !important;
+  }
+
+  .resume-timeline-item {
+    padding-bottom: 5mm !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .resume-timeline-item-desc p,
+  .resume-timeline-item-desc ul {
+    margin-bottom: 3mm !important;
+  }
+
+  .badge {
+    border: 1pt solid #8d9aad !important;
+    background: #fff !important;
+    color: #232931 !important;
+    font-weight: 500;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+}
+@media print {
+  .resume-timeline-details {
+    display: block !important;
+  }
+
+  .resume-timeline-summary {
+    display: none !important;
+  }
+
+  .resume-timeline-details .resume-timeline-item-desc {
+    height: auto !important;
+    margin-top: 0 !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    transition: none !important;
+  }
+}
+@media print {
+  .resume-wrapper-inner {
+    padding-left: 8mm !important;
+    padding-right: 8mm !important;
+  }
+
+  .resume-timeline-item-header .d-flex {
+    gap: 6mm;
+  }
+
+  .resume-company-name {
+    flex-shrink: 0;
+    max-width: 32mm;
+    text-align: right;
+    word-break: normal;
+  }
+
+  .resume-position-title {
+    max-width: calc(100% - 38mm);
+  }
+
+  .print-padding-guard {
+    display: none;
+  }
+}
+@media print {
+  .print-contact-links {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5mm 6mm;
+    margin-top: 4mm;
+    padding-top: 3mm;
+    border-top: 0.75pt solid #d9e0ea;
+    color: #232931 !important;
+    font-size: 8.5pt;
+    line-height: 1.35;
+  }
+
+  .print-contact-links div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .print-contact-links strong {
+    color: #434E5E;
+    font-weight: 700;
   }
 }
