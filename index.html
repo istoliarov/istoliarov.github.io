@@ -90,6 +90,10 @@
     })();
   </script>
   <link rel="stylesheet" href="assets/css/career-feed.css">
+  <style>
+    @media (max-width:600px){.mobile-action-bar{grid-template-columns:1fr 1fr 1.2fr}.mobile-action-bar .button{padding-inline:10px}}
+    @media (max-width:360px){.mobile-action-bar{gap:6px;padding-inline:10px}.mobile-action-bar .button{padding-inline:6px;font-size:13px}}
+  </style>
   <script defer src="assets/js/career-feed.js"></script>
 </head>
 <body>
@@ -235,6 +239,6 @@
     </div>
   </main>
   <footer class="site-footer"><div class="container"><p>© <span id="current-year"></span> Igor Stolyarov</p><a href="https://calendar.google.com/calendar/embed?src=iastoliarov%40gmail.com&amp;ctz=Europe%2FMoscow">Calendar</a></div></footer>
-  <div class="mobile-action-bar" aria-label="Quick actions"><button class="button button-secondary print-button-mobile" type="button"><i class="fas fa-download" aria-hidden="true"></i>CV</button><a class="button button-primary" href="mailto:iastoliarov@gmail.com"><i class="far fa-envelope" aria-hidden="true"></i>Contact</a></div>
+  <div class="mobile-action-bar" aria-label="Quick actions"><button class="button button-secondary print-button-mobile" type="button"><i class="fas fa-download" aria-hidden="true"></i>CV</button><a class="button button-secondary mobile-apps-button" href="apps/"><i class="fas fa-th-large" aria-hidden="true"></i>Apps</a><a class="button button-primary" href="mailto:iastoliarov@gmail.com"><i class="far fa-envelope" aria-hidden="true"></i>Contact</a></div>
 </body>
 </html>
