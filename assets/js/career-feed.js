@@ -54,6 +54,92 @@
     }
   });
 
+  const navLinks = [...nav.querySelectorAll('a[href^="#"]')];
+  const navSections = new Map(navLinks.map(link => {
+    const id = link.getAttribute('href').slice(1);
+    return [id, document.getElementById(id)];
+  }).filter(([, section]) => section));
+  let lockedNavTarget = null;
+  let scrollEndTimer = 0;
+  let scrollFrame = 0;
+
+  function setActiveNav(id) {
+    navLinks.forEach(link => {
+      const active = link.getAttribute('href') === `#${id}`;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
+
+  function normalDocumentTop(element) {
+    let top = 0;
+    let node = element;
+    while (node) {
+      top += node.offsetTop;
+      node = node.offsetParent;
+    }
+    return top;
+  }
+
+  function hashSection() {
+    const id = window.location.hash.slice(1);
+    return navSections.has(id) ? id : '';
+  }
+
+  function activeSectionFromScroll() {
+    if (lockedNavTarget) return lockedNavTarget;
+
+    const header = document.querySelector('.site-header');
+    const headerOffset = (header ? header.offsetHeight : 0) + 48;
+    const scrollPoint = window.scrollY + headerOffset;
+    const education = navSections.get('education');
+    const awards = navSections.get('awards');
+    const lowerSectionTop = Math.min(
+      education ? normalDocumentTop(education) : Number.POSITIVE_INFINITY,
+      awards ? normalDocumentTop(awards) : Number.POSITIVE_INFINITY
+    );
+    const currentHash = hashSection();
+    const atPageBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+
+    if (atPageBottom) {
+      return currentHash === 'education' || currentHash === 'awards' ? currentHash : 'awards';
+    }
+    if (scrollPoint >= lowerSectionTop) {
+      return currentHash === 'awards' ? 'awards' : 'education';
+    }
+    if ((currentHash === 'skills' || currentHash === 'about') && scrollPoint >= normalDocumentTop(navSections.get('experience'))) {
+      return currentHash;
+    }
+    return 'experience';
+  }
+
+  function syncActiveNav() {
+    scrollFrame = 0;
+    setActiveNav(activeSectionFromScroll());
+  }
+
+  navLinks.forEach(link => link.addEventListener('click', () => {
+    lockedNavTarget = link.getAttribute('href').slice(1);
+    setActiveNav(lockedNavTarget);
+  }));
+
+  window.addEventListener('scroll', () => {
+    window.clearTimeout(scrollEndTimer);
+    scrollEndTimer = window.setTimeout(() => {
+      lockedNavTarget = null;
+      syncActiveNav();
+    }, 180);
+    if (!scrollFrame) scrollFrame = window.requestAnimationFrame(syncActiveNav);
+  }, { passive: true });
+
+  window.addEventListener('hashchange', () => {
+    const id = hashSection();
+    if (id) setActiveNav(id);
+  });
+
+  syncActiveNav();
+
   const search = document.querySelector('#experience-search');
   const chips = [...document.querySelectorAll('[data-filter]')];
   const items = [...document.querySelectorAll('.experience-item')];
