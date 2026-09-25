@@ -143,6 +143,50 @@
   const search = document.querySelector('#experience-search');
   const chips = [...document.querySelectorAll('[data-filter]')];
   const items = [...document.querySelectorAll('.experience-item')];
+  const totalExperience = document.querySelector('.experience-total');
+
+  function parseYearMonth(value) {
+    const match = /^(\d{4})-(\d{2})$/.exec(value || '');
+    if (!match) return null;
+    return { year: Number(match[1]), month: Number(match[2]) };
+  }
+
+  function inclusiveMonthCount(start, end) {
+    return Math.max(1, (end.year - start.year) * 12 + end.month - start.month + 1);
+  }
+
+  function formatDuration(totalMonths) {
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+    const parts = [];
+    if (years) parts.push(`${years} ${years === 1 ? 'yr' : 'yrs'}`);
+    if (months) parts.push(`${months} ${months === 1 ? 'mo' : 'mos'}`);
+    return parts.join(' ') || '1 mo';
+  }
+
+  function updateExperienceDurations() {
+    const now = new Date();
+    const currentMonth = { year: now.getFullYear(), month: now.getMonth() + 1 };
+
+    items.forEach(item => {
+      const start = parseYearMonth(item.dataset.start);
+      const end = parseYearMonth(item.dataset.end) || currentMonth;
+      const output = item.querySelector('[data-role-duration]');
+      if (!start || !output) return;
+
+      const formatted = formatDuration(inclusiveMonthCount(start, end));
+      const approximate = item.dataset.durationApproximate === 'true';
+      output.querySelector('[data-duration-label]').textContent = `${approximate ? '~' : ''}${formatted}`;
+      output.setAttribute('aria-label', `${approximate ? 'Approximately ' : ''}${formatted} in this role`);
+    });
+
+    const careerStart = parseYearMonth(totalExperience?.dataset.careerStart);
+    if (careerStart && totalExperience) {
+      const formatted = formatDuration(inclusiveMonthCount(careerStart, currentMonth));
+      totalExperience.querySelector('strong').textContent = formatted;
+      totalExperience.setAttribute('aria-label', `Total professional experience: ${formatted}`);
+    }
+  }
   const resultCount = document.querySelector('.result-count');
   const empty = document.querySelector('.empty-results');
   let activeFilter = 'all';
@@ -185,5 +229,6 @@
   document.querySelector('.print-button').addEventListener('click', () => window.print());
   document.querySelector('.print-button-mobile').addEventListener('click', () => window.print());
   document.querySelector('#current-year').textContent = new Date().getFullYear();
+  updateExperienceDurations();
   updateResults();
 })();
