@@ -226,8 +226,37 @@
       menuButton.setAttribute('aria-expanded', 'false');
     }
   });
-  document.querySelector('.print-button').addEventListener('click', () => window.print());
-  document.querySelector('.print-button-mobile').addEventListener('click', () => window.print());
+  const printableDetails = [...document.querySelectorAll('.experience-item details')];
+  let printState = null;
+
+  function preparePrint() {
+    if (printState) return;
+    printState = {
+      title: document.title,
+      openDetails: printableDetails.map(detail => detail.open)
+    };
+    printableDetails.forEach(detail => { detail.open = true; });
+    document.title = 'Igor_Stolyarov_Backend_Engineer_Resume';
+  }
+
+  function restoreAfterPrint() {
+    if (!printState) return;
+    printableDetails.forEach((detail, index) => { detail.open = printState.openDetails[index]; });
+    document.title = printState.title;
+    printState = null;
+  }
+
+  function printResume() {
+    preparePrint();
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => window.print());
+    });
+  }
+
+  window.addEventListener('beforeprint', preparePrint);
+  window.addEventListener('afterprint', restoreAfterPrint);
+  document.querySelector('.print-button').addEventListener('click', printResume);
+  document.querySelector('.print-button-mobile').addEventListener('click', printResume);
   document.querySelector('#current-year').textContent = new Date().getFullYear();
   updateExperienceDurations();
   updateResults();
